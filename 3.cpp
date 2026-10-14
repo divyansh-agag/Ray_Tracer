@@ -279,15 +279,7 @@ int main()
         << Width << " " << Height << "\n"
         << "255\n";
 
-    double focal_length = 1.0;
-    double fov = pi/2;// horizontal fov
     
-    double viewport_Width = 2 * tan(fov/2) * focal_length;
-    double viewport_Height = (Height/Width)*viewport_Width;
-    
-    double viewport_delw = viewport_Width/Width;
-    double viewport_delh = viewport_Height / Height;
-    vec3 camera_pos = {0,0,0};
     
     Sphere sphere1 ={
         //{x,y,z} -> center..
@@ -331,30 +323,39 @@ int main()
     Objects[3] = sphere4;
     Objects[4] = sphere5;
     
-
-    vec3 vup = {0,1,0};
-    vec3 lookat = {0,-1,0};
-    //v vec
-    double scale_factor_vup = 1/dot_product(vup, multiply_const(lookat, -1));
-    vec3 v = add(multiply_const(vup, scale_factor_vup), lookat);
-    vec3 viewport_top_left = {camera_pos.x - viewport_Width/2, camera_pos.y+viewport_Height/2, -focal_length};
-    //u vec
-    vec3 u = unit_vector(cross_product(lookat, vup));
+    double focal_length = 1.0;
+    double fov = pi/2;// horizontal fov
     
-    vec3 pixel00_pos = add(sub(viewport_top_left, {0,viewport_delh/2,0}), {viewport_delw/2,0,0});
+    double viewport_Width = 2 * tan(fov/2) * focal_length;
+    double viewport_Height = (Height/Width)*viewport_Width;
+    
+    double viewport_delw = viewport_Width/Width;
+    double viewport_delh = viewport_Height / Height;
 
+    vec3 camera_pos = {-2, 2, 1};
+    vec3 vup = {0,1,0}; // MUST BE UNIT VEC
+    vec3 lookat = unit_vector({0,0,-1}); // MUST BE UNIT VEC
+
+    vec3 u = unit_vector(cross_product(lookat, vup));
+    vec3 v = unit_vector(cross_product(u, lookat));
+    vec3 viewport_delw_vec = multiply_const(u, viewport_delw);
+    vec3 viewport_delh_vec = multiply_const(v, viewport_delh);
+
+
+    vec3 viewport_top_left = add(add(camera_pos, multiply_const(lookat, focal_length)),
+                                     add(multiply_const(v, viewport_Height/2), multiply_const(u, -viewport_Width/2)));
+    //{camera_pos.x - viewport_Width/2, camera_pos.y+viewport_Height/2, -focal_length};
+    vec3 pixel00_pos = add(viewport_top_left, add(multiply_const(viewport_delw_vec, 1/2), multiply_const(viewport_delh_vec, -1/2)));
+    
     #pragma omp parallel for schedule(dynamic)
     for(int i=0;i<(int)Height;i++){
         for(int j=0;j<(int)Width;j++){
-            vec3 pixelij_pos = add(pixel00_pos, {j*viewport_delw, -i*viewport_delh, 0});
+            vec3 pixelij_pos = add(pixel00_pos, add(multiply_const(viewport_delw_vec, j), multiply_const(viewport_delh_vec, -i)));
             vec3 pixelij_clr = {0,0,0};
 
             for(int sample = 0;sample<sample_per_pixel; sample++){// Anti-aliasing..
-                vec3 pixel_cords = {
-                    pixelij_pos.x + random_double(-0.5, 0.5)*viewport_delw,
-                    pixelij_pos.y + random_double(-0.5, 0.5)*viewport_delh,
-                    pixelij_pos.z
-                };
+                vec3 pixel_cords = add(pixelij_pos, 
+                    add(multiply_const(viewport_delw_vec,random_double(-0.5, 0.5)), multiply_const(viewport_delh_vec,random_double(-0.5, 0.5))));
                 vec3 ray_ij_dirc = unit_vector(sub(pixel_cords, camera_pos));
                 int depth = 0;
                 bool debug = false;
@@ -366,7 +367,7 @@ int main()
             double sample_inv_const = 1.0/sample_per_pixel;
             pixelij_clr = multiply_const(pixelij_clr, sample_inv_const);
             
-            image[i *Width + j] = pixelij_clr;
+            image[i * Width + j] = pixelij_clr;
             
         }
 
