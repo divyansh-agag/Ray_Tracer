@@ -1,0 +1,285 @@
+vec3 ray_color(
+    Sphere Obj[],
+    Ray ray,
+    int depth,
+    double curr_ref_index,
+    bool trace = false
+) {
+    depth++;
+
+    if (trace) {
+        cerr << "\n========== BOUNCE " << depth << " ==========\n";
+
+        cerr << "Origin: ("
+             << ray.ray_origin.x << ", "
+             << ray.ray_origin.y << ", "
+             << ray.ray_origin.z << ")\n";
+
+        cerr << "Direction: ("
+             << ray.ray_dirc.x << ", "
+             << ray.ray_dirc.y << ", "
+             << ray.ray_dirc.z << ")\n";
+
+        cerr << "Current refractive index: "
+             << curr_ref_index << '\n';
+    }
+
+    if (depth > MAX_BOUNCE_LIMIT) {
+        if (trace) {
+            cerr << "MAX BOUNCE LIMIT REACHED\n";
+        }
+
+        return {0, 0, 0};
+    }
+
+    // Find the nearest intersection.
+    Hit_info hit_info = ray_color_helper(Obj, ray);
+
+    if (!hit_info.hit) {
+        if (trace) {
+            cerr << "MISS: Ray escaped into the sky.\n";
+        }
+
+        return hit_info.color;
+    }
+
+    if (trace) {
+        cerr << "HIT!\n";
+
+        cerr << "Hit point: ("
+             << hit_info.hit_point.x << ", "
+             << hit_info.hit_point.y << ", "
+             << hit_info.hit_point.z << ")\n";
+
+        cerr << "Normal: ("
+             << hit_info.normal.x << ", "
+             << hit_info.normal.y << ", "
+             << hit_info.normal.z << ")\n";
+
+        cerr << "Material: "
+             << hit_info.material << '\n';
+    }
+
+    // Move the ray origin to the intersection.
+    ray.ray_origin = hit_info.hit_point;
+
+    // =========================================================
+    // LAMBERTIAN
+    // =========================================================
+    if (hit_info.material == LAMBERTIAN) {
+
+        if (trace) {
+            cerr << "LAMBERTIAN SCATTER\n";
+        }
+
+        ray.ray_dirc = unit_vector(
+            add(hit_info.normal, genrate_random_dirc())
+        );
+    }
+
+    // =========================================================
+    // METAL
+    // =========================================================
+    else if (hit_info.material == METAL) {
+
+        if (trace) {
+            cerr << "METAL REFLECTION\n";
+        }
+
+        reflect(ray, hit_info, false);
+
+        ray.ray_dirc = unit_vector(ray.ray_dirc);
+    }
+
+    // =========================================================
+    // GLASS
+    // =========================================================
+    else if (hit_info.material == GLASS) {
+
+        // The sphere's geometric normal points outward.
+        vec3 normal = hit_info.normal;
+
+        // Determine whether the ray enters or exits the glass.
+        bool is_entering =
+            dot_product(ray.ray_dirc, normal) < 0.0;
+
+        // Orient the normal against the incident ray.
+        if (!is_entering) {
+            normal = multiply_const(normal, -1.0);
+        }
+
+        // Determine the refractive index of the destination medium.
+        double next_ref_index =
+            is_entering
+                ? hit_info.r_index
+                : MEDIUM_REFACTIVE_INDEX;
+
+        double eta = curr_ref_index / next_ref_index;
+
+        // Incident direction must be normalized.
+        ray.ray_dirc = unit_vector(ray.ray_dirc);
+
+        // Cosine of the incident angle.
+        double cos_theta = min(
+            dot_product(
+                multiply_const(ray.ray_dirc, -1.0),
+                normal
+            ),
+            1.0
+        );
+
+        cos_theta = max(0.0, cos_theta);
+
+        // Sine of the incident angle.
+        double sin_theta = sqrt(
+            max(0.0, 1.0 - cos_theta * cos_theta)
+        );
+
+        // Snell's law.
+        double sin_refracted = eta * sin_theta;
+
+        if (trace) {
+            cerr << "\n--- GLASS INTERACTION ---\n";
+
+            cerr << "Entering glass: "
+                 << (is_entering ? "YES" : "NO") << '\n';
+
+            cerr << "Oriented normal: ("
+                 << normal.x << ", "
+                 << normal.y << ", "
+                 << normal.z << ")\n";
+
+            cerr << "Incident refractive index: "
+                 << curr_ref_index << '\n';
+
+            cerr << "Destination refractive index: "
+                 << next_ref_index << '\n';
+
+            cerr << "Eta (n1/n2): "
+                 << eta << '\n';
+
+            cerr << "cos(theta incident): "
+                 << cos_theta << '\n';
+
+            cerr << "sin(theta incident): "
+                 << sin_theta << '\n';
+
+            cerr << "sin(theta refracted): "
+                 << sin_refracted << '\n';
+        }
+
+        // -----------------------------------------------------
+        // TOTAL INTERNAL REFLECTION
+        // -----------------------------------------------------
+        if (sin_refracted > 1.0) {
+
+            if (trace) {
+                cerr << "TOTAL INTERNAL REFLECTION\n";
+            }
+
+            // Reflect using the correctly oriented normal.
+            double projection =
+                dot_product(ray.ray_dirc, normal);
+
+            ray.ray_dirc = sub(
+                ray.ray_dirc,
+                multiply_const(normal, 2.0 * projection)
+            );
+
+            ray.ray_dirc = unit_vector(ray.ray_dirc);
+
+            // The ray remains in the same medium.
+            // Do not update curr_ref_index.
+
+            if (trace) {
+                cerr << "Reflected direction: ("
+                     << ray.ray_dirc.x << ", "
+                     << ray.ray_dirc.y << ", "
+                     << ray.ray_dirc.z << ")\n";
+            }
+        }
+
+        // -----------------------------------------------------
+        // REFRACTION
+        // -----------------------------------------------------
+        else {
+
+            // Component perpendicular to the normal.
+            vec3 r_perp = multiply_const(
+                add(
+                    ray.ray_dirc,
+                    multiply_const(normal, cos_theta)
+                ),
+                eta
+            );
+
+            // Component parallel to the normal.
+            double parallel_sq = max(
+                0.0,
+                1.0 - dot_product(r_perp, r_perp)
+            );
+
+            vec3 r_parallel = multiply_const(
+                normal,
+                -sqrt(parallel_sq)
+            );
+
+            // Resulting refracted direction.
+            ray.ray_dirc = unit_vector(
+                add(r_perp, r_parallel)
+            );
+
+            // The ray has entered the destination medium.
+            curr_ref_index = next_ref_index;
+
+            if (trace) {
+                cerr << "REFRACTION OCCURRED\n";
+
+                cerr << "Perpendicular component: ("
+                     << r_perp.x << ", "
+                     << r_perp.y << ", "
+                     << r_perp.z << ")\n";
+
+                cerr << "Parallel component: ("
+                     << r_parallel.x << ", "
+                     << r_parallel.y << ", "
+                     << r_parallel.z << ")\n";
+
+                cerr << "Refracted direction: ("
+                     << ray.ray_dirc.x << ", "
+                     << ray.ray_dirc.y << ", "
+                     << ray.ray_dirc.z << ")\n";
+            }
+        }
+
+        // Offset the origin to avoid immediately hitting
+        // the same surface again.
+        ray.ray_origin = add(
+            hit_info.hit_point,
+            multiply_const(ray.ray_dirc, 0.001)
+        );
+    }
+
+    // =========================================================
+    // TRACE THE NEXT BOUNCE
+    // =========================================================
+    vec3 incoming_light = ray_color(
+        Obj,
+        ray,
+        depth,
+        curr_ref_index,
+        trace
+    );
+
+    if (trace) {
+        cerr << "Returning from bounce "
+             << depth << '\n';
+    }
+
+    // Apply the material's color.
+    return {
+        incoming_light.x * hit_info.color.x,
+        incoming_light.y * hit_info.color.y,
+        incoming_light.z * hit_info.color.z
+    };
+}

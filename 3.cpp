@@ -11,6 +11,7 @@ using namespace std;
 #define METAL 2
 #define GLASS 3
 #define MEDIUM_REFACTIVE_INDEX 1
+#define pi 3.14
 
 
 struct vec3 {
@@ -66,6 +67,14 @@ vec3 sub(vec3 a, vec3 b){
 vec3 add(vec3 a, vec3 b){
     return {a.x+b.x, a.y+b.y, a.z+b.z};
 }
+
+vec3 cross_product(vec3 a, vec3 b){ //does NOT return unit vector convert if needed
+    return {
+            (a.y*b.z - a.z*b.y),
+            (a.z*b.x - a.x*b.z),
+            (a.x*b.y - b.x*a.y)};
+}
+
 bool cmp(vec3 a, vec3 b){
     if(a.x == b.x && a.y == b.y && a.z == b.z)return 1;
     return 0;
@@ -271,7 +280,9 @@ int main()
         << "255\n";
 
     double focal_length = 1.0;
-    double viewport_Width = 2.0;
+    double fov = pi/2;// horizontal fov
+    
+    double viewport_Width = 2 * tan(fov/2) * focal_length;
     double viewport_Height = (Height/Width)*viewport_Width;
     
     double viewport_delw = viewport_Width/Width;
@@ -320,8 +331,16 @@ int main()
     Objects[3] = sphere4;
     Objects[4] = sphere5;
     
+
+    vec3 vup = {0,1,0};
+    vec3 lookat = {0,-1,0};
+    //v vec
+    double scale_factor_vup = 1/dot_product(vup, multiply_const(lookat, -1));
+    vec3 v = add(multiply_const(vup, scale_factor_vup), lookat);
     vec3 viewport_top_left = {camera_pos.x - viewport_Width/2, camera_pos.y+viewport_Height/2, -focal_length};
-    //
+    //u vec
+    vec3 u = unit_vector(cross_product(lookat, vup));
+    
     vec3 pixel00_pos = add(sub(viewport_top_left, {0,viewport_delh/2,0}), {viewport_delw/2,0,0});
 
     #pragma omp parallel for schedule(dynamic)

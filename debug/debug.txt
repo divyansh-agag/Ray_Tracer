@@ -1,0 +1,54 @@
+
+========== BOUNCE 1 ==========
+Origin: (0, 0, 0)
+Direction: (0.000419146, -0.000872512, -1)
+Current refractive index: 1
+HIT!
+Hit point: (0.00062872, -0.00130877, -1.5)
+Normal: (0.00125744, -0.00261754, 0.999996)
+Material: 3
+
+--- GLASS INTERACTION ---
+Entering glass: YES
+Oriented normal: (0.00125744, -0.00261754, 0.999996)
+Incident refractive index: 1
+Destination refractive index: 2
+Eta (n1/n2): 0.5
+cos(theta incident): 0.999993
+sin(theta incident): 0.00387187
+sin(theta refracted): 0.00193593
+REFRACTION OCCURRED
+Perpendicular component: (0.000838288, -0.00174502, -5.62177e-06)
+Parallel component: (-0.00125744, 0.00261754, -0.999994)
+Refracted direction: (-0.000419149, 0.000872519, -1)
+
+========== BOUNCE 2 ==========
+Origin: (0.000628301, -0.0013079, -1.501)
+Direction: (-0.000419149, 0.000872519, -1)
+Current refractive index: 2
+HIT!
+Hit point: (0.000209571, -0.000436253, -2.5)
+Normal: (0.000419143, -0.000872506, -1)
+Material: 3
+
+--- GLASS INTERACTION ---
+Entering glass: NO
+Oriented normal: (-0.000419143, 0.000872506, 1)
+Incident refractive index: 2
+Destination refractive index: 1
+Eta (n1/n2): 2
+cos(theta incident): 0.999998
+sin(theta incident): 0.00193593
+sin(theta refracted): 0.00387187
+REFRACTION OCCURRED
+Perpendicular component: (-0.00167658, 0.00349005, -3.74781e-06)
+Parallel component: (0.00041914, -0.000872499, -0.999992)
+Refracted direction: (-0.00125744, 0.00261755, -0.999996)
+
+========== BOUNCE 3 ==========
+Origin: (0.000208314, -0.000433635, -2.501)
+Direction: (-0.00125744, 0.00261755, -0.999996)
+Current refractive index: 1
+MISS: Ray escaped into the sky.
+Returning from bounce 2
+Returning from bounce 1

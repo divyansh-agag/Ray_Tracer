@@ -3,8 +3,8 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-#define NUM_OBJS 4
-#define sample_per_pixel 50
+#define NUM_OBJS 3
+#define sample_per_pixel 500
 #define MAX_BOUNCE_LIMIT 10 //max bounce limit for any ray...
 #define Height 512.0
 #define Width  512.0
@@ -16,7 +16,7 @@ struct vec3 {
 };
 struct Ray{
     vec3 ray_dirc;
-    vec3 ray_origin;//point if origin
+    vec3 ray_origin;//point of origin
 };
 
 struct Sphere{
@@ -185,8 +185,6 @@ void print_color(vec3 clr){
     int bi = (int)(255.99 * clr.z);
     cout<<ri<<" "<<gi<<" "<<bi<<"\n";
 }
-
-vector<vec3> image(Width * Height);
 int main()
 {
     ios_base::sync_with_stdio(false);
@@ -218,17 +216,11 @@ int main()
         0.5,
         {0,1,0}
     };
-    Sphere sphere3 ={
-        {0,0,-2}, 
-        0.5,
-        {1,1,1}
-        
-    };
     Sphere sphere4 ={
         //{x,y,z} -> center..
         {0, -100.5, -4}, 
         100,    
-        {1,1,1}
+        {0,0,0}
     };
     //Sphere sphere3 ={
     //    {0,1,-3}, 
@@ -238,8 +230,7 @@ int main()
     Sphere Objects[5];
     Objects[0] = sphere1;
     Objects[1] = sphere2;
-    Objects[2] = sphere3;
-    Objects[3] = sphere4;
+    Objects[2] = sphere4;
     //cout<<viewport_Height<<" "<<viewport_Width<<endl;
     
     
@@ -247,7 +238,6 @@ int main()
     //
     vec3 pixel00_pos = add(sub(viewport_top_left, {0,viewport_delh/2,0}), {viewport_delw/2,0,0});
 
-    #pragma omp parallel for schedule(dynamic)
     for(int i=0;i<(int)Height;i++){
         for(int j=0;j<(int)Width;j++){
             vec3 pixelij_pos = add(pixel00_pos, {j*viewport_delw, -i*viewport_delh,0});
@@ -266,13 +256,10 @@ int main()
             double sample_inv_const = 1.0/sample_per_pixel;
             pixelij_clr = multiply_const(pixelij_clr, sample_inv_const);
             
-            image[i *Width + j] = pixelij_clr;
+            print_color(pixelij_clr);
         }
 
         
-    }
-    for(const auto& clr : image) {
-        print_color(clr);
     }
 
     return 0;
