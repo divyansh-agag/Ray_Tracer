@@ -2,11 +2,10 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-#define NUM_OBJS 5
 #define sample_per_pixel 500
 #define MAX_BOUNCE_LIMIT 50//max bounce limit for any ray...
-#define Height 512.0
-#define Width  512.0
+#define Height 675.0
+#define Width  1200.0
 #define LAMBERTIAN 1
 #define METAL 2
 #define GLASS 3
@@ -74,6 +73,13 @@ vec3 cross_product(vec3 a, vec3 b){ //does NOT return unit vector convert if nee
             (a.z*b.x - a.x*b.z),
             (a.x*b.y - b.x*a.y)};
 }
+vec3 multiply(vec3 a, vec3 b){
+    return {
+        a.x*b.x,
+        a.y*b.y,
+        a.z*b.z
+    };
+}
 
 bool cmp(vec3 a, vec3 b){
     if(a.x == b.x && a.y == b.y && a.z == b.z)return 1;
@@ -130,7 +136,7 @@ pair<bool, pair<vec3, vec3>> hit_sphere(Sphere s, Ray ray){
     return {false, {}};
 }
 
-Hit_info ray_color_helper(Sphere Obj[], Ray ray){
+Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray){
     //handels the single ray for many objects..
     
     //returns clr in 0.0 to 1.0 range and the normal vector where ray hits and also the point where ray hits the object ...
@@ -148,7 +154,7 @@ Hit_info ray_color_helper(Sphere Obj[], Ray ray){
     int material = -1;
     double fuzz;
     double r_index;
-    for(int i=0;i<NUM_OBJS;i++){
+    for(int i=0;i<Obj.size();i++){
         auto hit_info = hit_sphere(Obj[i], ray);
         if(hit_info.first){
             auto dist_vec1 = length(sub(hit_info.second.first, ray.ray_origin));
@@ -200,7 +206,7 @@ void reflect(struct Ray &ray, struct Hit_info &hit_info, bool tir){
     ray.ray_dirc = unit_vector(add(add(ray.ray_dirc, multiply_const(N_star, 2)), fuzz_vector));
 }
 
-vec3 ray_color(Sphere Obj[], Ray ray, int depth, double curr_ref_index){// will call this fxn for lambertian materials..
+vec3 ray_color(vector<Sphere> &Obj, Ray ray, int depth, double curr_ref_index){// will call this fxn for lambertian materials..
     //this will return the color for the ray 
     depth++;
     if(depth > MAX_BOUNCE_LIMIT) return {1,0,0};//can work on this part..
@@ -266,6 +272,13 @@ void print_color(vec3 clr){
     int bi = (int)(255.99 * clr.z);       
     cout<<ri<<" "<<gi<<" "<<bi<<"\n";
 }
+vec3 random_color(double minn, double maxx){
+    return{
+        random_double(minn, maxx),
+        random_double(minn, maxx),
+        random_double(minn, maxx)
+    };
+}
 
 vector<vec3> image(Width * Height);
 int main()
@@ -281,50 +294,110 @@ int main()
 
     
     
-    Sphere sphere1 ={
-        //{x,y,z} -> center..
-        LAMBERTIAN,0,2,
-        {0,0,-2}, 
-        0.5,
-        {0.8,0,0}
-    };
-    Sphere sphere2 ={
-        //{x,y,z} -> center..
-        GLASS,0,1.50,
-        {-1,0,-2}, 
-        0.5,
-        {1,1,1}
-    };
-    Sphere sphere3 ={
-        //{x,y,z} -> center..
-        METAL,0.9,1,
-        {1,0,-2}, 
-        0.5,
-        {0.8,0.6,0.2}
-    };
-    Sphere sphere4 ={
-        //{x,y,z} -> center..
-        LAMBERTIAN,0,1,
-        {0, -100.5, -4}, 
-        100,    
-        {0.4,0.4,0.4}
-    };
-    Sphere sphere5 ={
-        //{x,y,z} -> center..
-        GLASS,0,1/1.50,
-        {-1,0,-2}, 
-        0.4,
-        {1,1,1}
-    };
-    Sphere Objects[NUM_OBJS];
-    Objects[0] = sphere1;
-    Objects[1] = sphere2;
-    Objects[2] = sphere3;
-    Objects[3] = sphere4;
-    Objects[4] = sphere5;
+    vector<Sphere> Objects;
+
+    // Ground sphere
+    Objects.push_back({
+        LAMBERTIAN,
+        0.0,
+        0.0,
+        {0, -1000, 0},
+        1000,
+        {0.7, 0.7, 0.7}
+    });
+
+    // Small random spheres
+    for (int a = -11; a <= 11; a++) {
+        for (int b = -11; b <= 11; b++) {
+
+            double choose_mat = random_double(0.0, 1.0);
+
+            vec3 center = {
+                a + 0.9 * random_double(0.0, 1.0),
+                0.2,
+                b + 0.9 * random_double(0.0, 1.0)
+            };
+
+            // Keep the small spheres away from the large sphere at (4, 0.2, 0)
+            vec3 reference = {4, 0.2, 0};
+
+            if (length(sub(center, reference)) < 0.9) {
+                continue;
+            }
+
+            if (choose_mat < 0.8) {
+                // Diffuse material
+                Objects.push_back({
+                    LAMBERTIAN,
+                    0.0,
+                    0.0,
+                    center,
+                    0.2,
+                    multiply(
+                        random_color(0.5, 1.0),
+                        random_color(0.2, 1.0)
+                    )
+                });
+
+            } else if (choose_mat < 0.95) {
+                // Metal material
+                Objects.push_back({
+                    METAL,
+                    random_double(0.0, 0.5),
+                    0.0,
+                    center,
+                    0.2,
+                    random_color(0.5, 1.0)
+                });
+
+            } else {
+                // Glass material
+                Objects.push_back({
+                    GLASS,
+                    0.0,
+                    1.5,
+                    center,
+                    0.2,
+                    {1.0, 1.0, 1.0}
+                });
+            }
+        }
+    }
+
+    // Three large spheres
+
+    // Center: glass
+    Objects.push_back({
+        GLASS,
+        0.0,
+        1.5,
+        {0, 1, 0},
+        1.0,
+        {1.0, 1.0, 1.0}
+    });
+
+    // Left: diffuse
+    Objects.push_back({
+        LAMBERTIAN,
+        0.0,
+        0.0,
+        {-4, 1, 0},
+        1.0,
+        {0.4, 0.2, 0.1}
+    });
+
+    // Right: metal
+    Objects.push_back({
+        METAL,
+        0.0,
+        0.0,
+        {4, 1, 0},
+        1.0,
+        {0.7, 0.6, 0.5}
+    });
     
     double focal_length = 1.0;
-    double fov = pi/2;// horizontal fov
+    double fov = pi/6;// horizontal fov
     
     double viewport_Width = 2 * tan(fov/2) * focal_length;
     double viewport_Height = (Height/Width)*viewport_Width;
@@ -332,9 +405,9 @@ int main()
     double viewport_delw = viewport_Width/Width;
     double viewport_delh = viewport_Height / Height;
 
-    vec3 camera_pos = {-2, 2, 1};
+    vec3 camera_pos = {13,2,3};
     vec3 vup = {0,1,0}; // MUST BE UNIT VEC
-    vec3 lookat = unit_vector({0,0,-1}); // MUST BE UNIT VEC
+    vec3 lookat = unit_vector({-3,-0.25,-1}); // MUST BE UNIT VEC
 
     vec3 u = unit_vector(cross_product(lookat, vup));
     vec3 v = unit_vector(cross_product(u, lookat));
