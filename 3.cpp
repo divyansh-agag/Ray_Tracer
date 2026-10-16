@@ -11,6 +11,7 @@ using namespace std;
 #define GLASS 3
 #define MEDIUM_REFACTIVE_INDEX 1
 #define pi 3.14
+#define shutter_time 0.25
 
 struct vec3 {
     double x,y,z;
@@ -24,13 +25,22 @@ struct Ray{
     vec3 ray_origin;//point of origin
 };
 
-struct Sphere{
+struct Sphere{/*int material;
+    double fuzz;
+    double r_index;
+    vec3 st_center = {0,0,0};
+    vec3 curr_center = {0,0,0};
+    double radius = 0;
+    vec3 clr = {0,0,0};//in 0.0 to 1.0.... 
+    vec3 vel = {0,0,0};
+    */
     int material;
     double fuzz;
     double r_index;
-    vec3 center = {0,0,0};
+    vec3 st_center = {0,0,0};
     double radius = 0;
     vec3 clr = {0,0,0};//in 0.0 to 1.0.... 
+    vec3 vel = {0,0,0};
 };
 struct Hit_info{ // struct returned by ray_clr_helper
     bool hit;
@@ -115,11 +125,11 @@ vec3 random_vector_hemisphere(vec3 normal){
 }
 
 
-pair<bool, vec3> hit_sphere(Sphere s, Ray ray){
+pair<bool, vec3> hit_sphere(Sphere s, Ray ray, double ray_time){
     // returns bool for hit / not hit and if hit 2 points where ray hits the sphere..
-
-    auto b = -2*dot_product(ray.ray_dirc, sub(s.center , ray.ray_origin));
-    auto c = dot_product(sub(s.center, ray.ray_origin), sub(s.center, ray.ray_origin)) - s.radius*s.radius;
+    vec3 curr_pos = add(s.st_center, multiply_const(s.vel, ray_time));
+    auto b = -2*dot_product(ray.ray_dirc, sub(curr_pos , ray.ray_origin));
+    auto c = dot_product(sub(curr_pos, ray.ray_origin), sub(curr_pos, ray.ray_origin)) - s.radius*s.radius;
     
     auto disc = b*b - 4*c;
     if(disc>=0){
@@ -139,7 +149,7 @@ pair<bool, vec3> hit_sphere(Sphere s, Ray ray){
     return {false, {}};
 }
 
-Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray){
+Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray, double ray_time){
     //handels the single ray for many objects..
     
     //returns clr in 0.0 to 1.0 range and the normal vector where ray hits and also the point where ray hits the object ...
@@ -158,7 +168,8 @@ Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray){
     double fuzz;
     double r_index;
     for(int i=0;i<Obj.size();i++){
-        auto hit_info = hit_sphere(Obj[i], ray);
+        vec3 curr_pos = add(Obj[i].st_center, multiply_const(Obj[i].vel, ray_time));
+        auto hit_info = hit_sphere(Obj[i], ray, ray_time);
         if(hit_info.first){
             auto curr_dist = length(sub(hit_info.second, ray.ray_origin));
             
@@ -169,7 +180,7 @@ Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray){
                 material = Obj[i].material;
                 r_index = Obj[i].r_index;
                 hit_point = hit_info.second;
-                unit_normal_vec = unit_vector(sub(hit_info.second, Obj[i].center));
+                unit_normal_vec = unit_vector(sub(hit_info.second, curr_pos));
                 min_dist = curr_dist;
             }
             
@@ -206,9 +217,11 @@ void reflect(struct Ray &ray, struct Hit_info &hit_info, bool tir){
 
 vec3 ray_color(vector<Sphere> &Obj, Ray ray, int depth, double curr_ref_index){// will call this fxn for lambertian materials..
     //this will return the color for the ray 
+    double ray_time = random_double(0.0, shutter_time);
+
     depth++;
     if(depth > MAX_BOUNCE_LIMIT) return {1,0,0};//can work on this part..
-    Hit_info hit_info = ray_color_helper(Obj, ray);
+    Hit_info hit_info = ray_color_helper(Obj, ray, ray_time);
     
     if(!hit_info.hit) {
         return hit_info.color; //if ray  misses every object returns the color of the sky
@@ -287,7 +300,8 @@ void Init_Objs(vector<Sphere> &Objects){
         0.0,
         {0, -1000, 0},
         1000,
-        {0.7, 0.7, 0.7}
+        {0.7, 0.7, 0.7},
+        {0,0,0}
     });
 
     // Small random spheres
@@ -320,7 +334,8 @@ void Init_Objs(vector<Sphere> &Objects){
                     multiply(
                         random_color(0.5, 1.0),
                         random_color(0.2, 1.0)
-                    )
+                    ),
+                    {0,1,0}
                 });
 
             } else if (choose_mat < 0.95) {
@@ -331,7 +346,8 @@ void Init_Objs(vector<Sphere> &Objects){
                     0.0,
                     center,
                     0.2,
-                    random_color(0.5, 1.0)
+                    random_color(0.5, 1.0),
+                    {0,0,0}
                 });
 
             } else {
@@ -342,7 +358,8 @@ void Init_Objs(vector<Sphere> &Objects){
                     1.5,
                     center,
                     0.2,
-                    {1.0, 1.0, 1.0}
+                    {1.0, 1.0, 1.0},
+                    {0,0,0}
                 });
             }
         }
@@ -357,7 +374,8 @@ void Init_Objs(vector<Sphere> &Objects){
         1.5,
         {0, 1, 0},
         1.0,
-        {1.0, 1.0, 1.0}
+        {1.0, 1.0, 1.0},
+        {0,0,0}
     });
 
     // Left: diffuse
@@ -367,7 +385,8 @@ void Init_Objs(vector<Sphere> &Objects){
         0.0,
         {-4, 1, 0},
         1.0,
-        {0.4, 0.2, 0.1}
+        {0.4, 0.2, 0.1},
+        {0,0,0}
     });
 
     // Right: metal
@@ -377,7 +396,8 @@ void Init_Objs(vector<Sphere> &Objects){
         0.0,
         {4, 1, 0},
         1.0,
-        {0.7, 0.6, 0.5}
+        {0.7, 0.6, 0.5},
+        {0,0,0}
     });
 }
 
@@ -414,7 +434,6 @@ int main()
     vector<Sphere> Objects;
 
     Init_Objs(Objects);
-    
     
     double focal_length = 1.0;
     double fov = pi/6;// horizontal fov
