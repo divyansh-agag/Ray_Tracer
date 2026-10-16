@@ -4,18 +4,21 @@
 using namespace std;
 #define sample_per_pixel 500
 #define MAX_BOUNCE_LIMIT 50//max bounce limit for any ray...
-#define Height 675.0
-#define Width  1200.0
+#define Height 337.0
+#define Width  600.0
 #define LAMBERTIAN 1
 #define METAL 2
 #define GLASS 3
 #define MEDIUM_REFACTIVE_INDEX 1
 #define pi 3.14
 
-
 struct vec3 {
     double x,y,z;
 };
+
+vector<vec3> image(Width * Height);
+std::chrono::high_resolution_clock::time_point starttime; 
+
 struct Ray{
     vec3 ray_dirc;
     vec3 ray_origin;//point of origin
@@ -112,7 +115,7 @@ vec3 random_vector_hemisphere(vec3 normal){
 }
 
 
-pair<bool, pair<vec3, vec3>> hit_sphere(Sphere s, Ray ray){
+pair<bool, vec3> hit_sphere(Sphere s, Ray ray){
     // returns bool for hit / not hit and if hit 2 points where ray hits the sphere..
 
     auto b = -2*dot_product(ray.ray_dirc, sub(s.center , ray.ray_origin));
@@ -129,8 +132,8 @@ pair<bool, pair<vec3, vec3>> hit_sphere(Sphere s, Ray ray){
         vec3 point1 = add(ray.ray_origin, multiply_const(ray.ray_dirc, t1));
         vec3 point2 = add(ray.ray_origin, multiply_const(ray.ray_dirc, t2));
 
-        if(t1 > 0.001) return {true, {point1, point1}};
-        if(t2 > 0.001) return {true, {point2, point2}};
+        if(t1 > 0.001) return {true, point1};
+        if(t2 > 0.001) return {true, point2};
         
     }
     return {false, {}};
@@ -157,22 +160,17 @@ Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray){
     for(int i=0;i<Obj.size();i++){
         auto hit_info = hit_sphere(Obj[i], ray);
         if(hit_info.first){
-            auto dist_vec1 = length(sub(hit_info.second.first, ray.ray_origin));
-            auto dist_vec2 = length(sub(hit_info.second.second, ray.ray_origin));
+            auto curr_dist = length(sub(hit_info.second, ray.ray_origin));
             
-            //if(min(dist_vec1, dist_vec2) < 0.0001)continue; // here min_dist > 0.0001 is added to fix the shadow acne problem...
-            
-            if(min(dist_vec1, dist_vec2) < min_dist){
+            if(curr_dist < min_dist){
 
                 color = Obj[i].clr;
                 fuzz = Obj[i].fuzz;
                 material = Obj[i].material;
                 r_index = Obj[i].r_index;
-                if(dist_vec1 <= dist_vec2) hit_point = hit_info.second.first;
-                else hit_point = hit_info.second.second;
-
-                unit_normal_vec = unit_vector(sub(hit_point, Obj[i].center));
-                min_dist = min(dist_vec1, dist_vec2);
+                hit_point = hit_info.second;
+                unit_normal_vec = unit_vector(sub(hit_info.second, Obj[i].center));
+                min_dist = curr_dist;
             }
             
             //return {max(0.0, unit_normal_vec.x), max(0.0, unit_normal_vec.y), max(0.0, unit_normal_vec.z*0.5)};
@@ -280,22 +278,8 @@ vec3 random_color(double minn, double maxx){
     };
 }
 
-vector<vec3> image(Width * Height);
-int main()
-{
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    //-ve z viewport dirc
-    // up -> +y
-    // in dic of Width +x(right handed system)
-    cout << "P3\n"
-        << Width << " " << Height << "\n"
-        << "255\n";
 
-    
-    
-    vector<Sphere> Objects;
-
+void Init_Objs(vector<Sphere> &Objects){
     // Ground sphere
     Objects.push_back({
         LAMBERTIAN,
@@ -395,6 +379,42 @@ int main()
         1.0,
         {0.7, 0.6, 0.5}
     });
+}
+
+void StartTimer(){
+    // --- START TIMER ---
+    starttime = chrono::high_resolution_clock::now();
+    cerr << "Rendering started...\n";
+}
+void StopTimer(){
+    // --- STOP TIMER ---
+    auto end_time = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsed = end_time - starttime;
+
+    int minutes = static_cast<int>(elapsed.count()) / 60;
+    double seconds = fmod(elapsed.count(), 60.0);
+
+    cerr << "\nDone!\n";
+    cerr << "Render time: " << elapsed.count() << "s (" 
+         << minutes << "m " << fixed << setprecision(2) << seconds << "s)\n";
+}
+int main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    //-ve z viewport dirc
+    // up -> +y
+    // in dic of Width +x(right handed system)
+    cout << "P3\n"
+        << Width << " " << Height << "\n"
+        << "255\n";
+
+    
+    
+    vector<Sphere> Objects;
+
+    Init_Objs(Objects);
+    
     
     double focal_length = 1.0;
     double fov = pi/6;// horizontal fov
@@ -418,8 +438,11 @@ int main()
     vec3 viewport_top_left = add(add(camera_pos, multiply_const(lookat, focal_length)),
                                      add(multiply_const(v, viewport_Height/2), multiply_const(u, -viewport_Width/2)));
     //{camera_pos.x - viewport_Width/2, camera_pos.y+viewport_Height/2, -focal_length};
-    vec3 pixel00_pos = add(viewport_top_left, add(multiply_const(viewport_delw_vec, 1/2), multiply_const(viewport_delh_vec, -1/2)));
+    vec3 pixel00_pos = add(viewport_top_left, add(multiply_const(viewport_delw_vec, 1/2), multiply_const(viewport_delh_vec, -0.5)));
     
+
+
+    StartTimer();
     #pragma omp parallel for schedule(dynamic)
     for(int i=0;i<(int)Height;i++){
         for(int j=0;j<(int)Width;j++){
@@ -431,7 +454,6 @@ int main()
                     add(multiply_const(viewport_delw_vec,random_double(-0.5, 0.5)), multiply_const(viewport_delh_vec,random_double(-0.5, 0.5))));
                 vec3 ray_ij_dirc = unit_vector(sub(pixel_cords, camera_pos));
                 int depth = 0;
-                bool debug = false;
                 vec3 clr = ray_color(Objects, {ray_ij_dirc, camera_pos}, depth, MEDIUM_REFACTIVE_INDEX);
 
                 pixelij_clr = add(pixelij_clr, clr);
@@ -443,9 +465,10 @@ int main()
             image[i * Width + j] = pixelij_clr;
             
         }
-
         
     }
+    StopTimer();
+
     for(const auto& clr : image) {
         print_color(clr);
     }
