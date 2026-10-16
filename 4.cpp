@@ -223,9 +223,8 @@ void reflect(struct Ray &ray, struct Hit_info &hit_info, bool tir){
     ray.ray_dirc = unit_vector(ray.ray_dirc + (N_star * 2) + fuzz_vector);
 }
 
-vec3 ray_color(vector<Sphere> &Obj, Ray ray, int depth, double curr_ref_index){// will call this fxn for lambertian materials..
+vec3 ray_color(vector<Sphere> &Obj, Ray ray, int depth, double curr_ref_index, double ray_time){// will call this fxn for lambertian materials..
     //this will return the color for the ray 
-    double ray_time = random_double(0.0, shutter_time);
 
     depth++;
     if(depth > MAX_BOUNCE_LIMIT) return {1,0,0};//can work on this part..
@@ -274,7 +273,7 @@ vec3 ray_color(vector<Sphere> &Obj, Ray ray, int depth, double curr_ref_index){/
     }       
     // Nudge origin forward to prevent self-intersection
     ray.ray_origin = hit_info.hit_point + (ray.ray_dirc * 0.001);
-    vec3 incoming_light = ray_color(Obj, ray, depth, curr_ref_index);
+    vec3 incoming_light = ray_color(Obj, ray, depth, curr_ref_index, ray_time);
 
     //material albedo * incoming light
     return {
@@ -476,10 +475,12 @@ int main()
             vec3 pixelij_clr = {0,0,0};
 
             for(int sample = 0;sample<sample_per_pixel; sample++){// Anti-aliasing..
+                double ray_time = random_double(0.0, shutter_time);
+
                 vec3 pixel_cords = pixelij_pos + (viewport_delw_vec * random_double(-0.5, 0.5)) + (viewport_delh_vec * random_double(-0.5, 0.5));
                 vec3 ray_ij_dirc = unit_vector(pixel_cords - camera_pos);
                 int depth = 0;
-                vec3 clr = ray_color(Objects, {ray_ij_dirc, camera_pos}, depth, MEDIUM_REFACTIVE_INDEX);
+                vec3 clr = ray_color(Objects, {ray_ij_dirc, camera_pos}, depth, MEDIUM_REFACTIVE_INDEX, ray_time);
 
                 pixelij_clr = pixelij_clr + clr;
                 
