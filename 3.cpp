@@ -15,6 +15,17 @@ using namespace std;
 
 struct vec3 {
     double x,y,z;
+
+    vec3 operator+(const vec3 &other){
+        return {x+other.x, y+other.y, z+other.z};
+    }
+    vec3 operator-(const vec3 &other){
+        return {x-other.x, y-other.y, z-other.z};
+    }
+    vec3 operator*(const double &scaler){
+        return {x*scaler, y*scaler, z*scaler};
+    }
+
 };
 
 vector<vec3> image(Width * Height);
@@ -121,13 +132,13 @@ vec3 random_vector_hemisphere(vec3 normal){
     //returns a random vector inside the hemisphere which has  ->  normal.vec >= 0 
     vec3 random_dirc = genrate_random_dirc();
     if(dot_product(normal, random_dirc) >= 0) return random_dirc;
-    else return multiply_const(random_dirc, -1);
+    else return random_dirc * -1;
 }
 
 
 pair<bool, vec3> hit_sphere(Sphere s, Ray ray, double ray_time){
     // returns bool for hit / not hit and if hit 2 points where ray hits the sphere..
-    vec3 curr_pos = add(s.st_center, multiply_const(s.vel, ray_time));
+    vec3 curr_pos = s.st_center + s.vel * ray_time;
     auto b = -2*dot_product(ray.ray_dirc, sub(curr_pos , ray.ray_origin));
     auto c = dot_product(sub(curr_pos, ray.ray_origin), sub(curr_pos, ray.ray_origin)) - s.radius*s.radius;
     
@@ -139,8 +150,8 @@ pair<bool, vec3> hit_sphere(Sphere s, Ray ray, double ray_time){
         if(t1<0 && t2<0)return {false, {}}; // check so that only t>0 considered so that we only view obj in front of camera..
 
 
-        vec3 point1 = add(ray.ray_origin, multiply_const(ray.ray_dirc, t1));
-        vec3 point2 = add(ray.ray_origin, multiply_const(ray.ray_dirc, t2));
+        vec3 point1 = ray.ray_origin + ray.ray_dirc * t1;
+        vec3 point2 = ray.ray_origin + ray.ray_dirc * t2;
 
         if(t1 > 0.001) return {true, point1};
         if(t2 > 0.001) return {true, point2};
@@ -157,7 +168,7 @@ Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray, double ray_time){
     //normalize ray_dirc
     ray.ray_dirc = unit_vector(ray.ray_dirc);
     double a = 0.5*(ray.ray_dirc.y + 1.0);
-    vec3 default_clr = add(multiply_const({1.0, 1.0, 1.0}, (1.0-a)), multiply_const({0.5, 0.7, 1.0}, a));
+    vec3 default_clr = vec3{1.0, 1.0, 1.0} * (1.0-a) + vec3{0.5, 0.7, 1.0} * a;
 
     // want to make this so that when ever ray hits a object it takes some color of that object 
     // and 
@@ -168,10 +179,10 @@ Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray, double ray_time){
     double fuzz;
     double r_index;
     for(int i=0;i<Obj.size();i++){
-        vec3 curr_pos = add(Obj[i].st_center, multiply_const(Obj[i].vel, ray_time));
+        vec3 curr_pos = Obj[i].st_center + Obj[i].vel * ray_time;
         auto hit_info = hit_sphere(Obj[i], ray, ray_time);
         if(hit_info.first){
-            auto curr_dist = length(sub(hit_info.second, ray.ray_origin));
+            auto curr_dist = length(hit_info.second - ray.ray_origin);
             
             if(curr_dist < min_dist){
 
@@ -180,7 +191,7 @@ Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray, double ray_time){
                 material = Obj[i].material;
                 r_index = Obj[i].r_index;
                 hit_point = hit_info.second;
-                unit_normal_vec = unit_vector(sub(hit_info.second, curr_pos));
+                unit_normal_vec = unit_vector(hit_info.second - curr_pos);
                 min_dist = curr_dist;
             }
             
@@ -212,7 +223,7 @@ void reflect(struct Ray &ray, struct Hit_info &hit_info, bool tir){
     }
     vec3 N_star = multiply_const(normal, dot_product(multiply_const(ray.ray_dirc, -1), normal));
     vec3 fuzz_vector = multiply_const(genrate_random_dirc(), hit_info.fuzz);
-    ray.ray_dirc = unit_vector(add(add(ray.ray_dirc, multiply_const(N_star, 2)), fuzz_vector));
+    ray.ray_dirc = unit_vector(ray.ray_dirc + multiply_const(N_star, 2)) + fuzz_vector;
 }
 
 vec3 ray_color(vector<Sphere> &Obj, Ray ray, int depth, double curr_ref_index){// will call this fxn for lambertian materials..
@@ -228,7 +239,7 @@ vec3 ray_color(vector<Sphere> &Obj, Ray ray, int depth, double curr_ref_index){/
     }
     
     if(hit_info.material == LAMBERTIAN){
-        ray.ray_dirc = unit_vector(add(hit_info.normal, genrate_random_dirc())); // lambertian distribution
+        ray.ray_dirc = unit_vector(hit_info.normal + genrate_random_dirc()); // lambertian distribution
     }
     else if(hit_info.material == METAL){
         //metals..
@@ -255,9 +266,9 @@ vec3 ray_color(vector<Sphere> &Obj, Ray ray, int depth, double curr_ref_index){/
             reflect(ray, hit_info, true);
         }else{
             vec3 a = multiply_const(hit_info.normal, -cos_refracted_normal);
-            vec3 b = multiply_const(unit_vector(add(hit_info.normal, multiply_const(ray.ray_dirc, 1/cos_incident_normal))), sin_refracted_normal);
+            vec3 b = multiply_const(unit_vector(hit_info.normal + multiply_const(ray.ray_dirc, 1/cos_incident_normal)), sin_refracted_normal);
             
-            vec3 refracted_ray = add(a,b);
+            vec3 refracted_ray = a + b;
             ray.ray_dirc = refracted_ray;
             
         }
@@ -265,7 +276,7 @@ vec3 ray_color(vector<Sphere> &Obj, Ray ray, int depth, double curr_ref_index){/
         
     }       
     // Nudge origin forward to prevent self-intersection
-    ray.ray_origin = add(hit_info.hit_point, multiply_const(ray.ray_dirc, 0.001));
+    ray.ray_origin = hit_info.hit_point + multiply_const(ray.ray_dirc, 0.001);
     vec3 incoming_light = ray_color(Obj, ray, depth, curr_ref_index);
 
     //material albedo * incoming light
@@ -454,10 +465,9 @@ int main()
     vec3 viewport_delh_vec = multiply_const(v, viewport_delh);
 
 
-    vec3 viewport_top_left = add(add(camera_pos, multiply_const(lookat, focal_length)),
-                                     add(multiply_const(v, viewport_Height/2), multiply_const(u, -viewport_Width/2)));
+    vec3 viewport_top_left = camera_pos + multiply_const(lookat, focal_length) + multiply_const(v, viewport_Height/2) + multiply_const(u, -viewport_Width/2);
     //{camera_pos.x - viewport_Width/2, camera_pos.y+viewport_Height/2, -focal_length};
-    vec3 pixel00_pos = add(viewport_top_left, add(multiply_const(viewport_delw_vec, 1/2), multiply_const(viewport_delh_vec, -0.5)));
+    vec3 pixel00_pos = viewport_top_left + multiply_const(viewport_delw_vec, 1/2) + multiply_const(viewport_delh_vec, -0.5);
     
 
 
@@ -465,17 +475,16 @@ int main()
     #pragma omp parallel for schedule(dynamic)
     for(int i=0;i<(int)Height;i++){
         for(int j=0;j<(int)Width;j++){
-            vec3 pixelij_pos = add(pixel00_pos, add(multiply_const(viewport_delw_vec, j), multiply_const(viewport_delh_vec, -i)));
+            vec3 pixelij_pos = pixel00_pos + multiply_const(viewport_delw_vec, j) + multiply_const(viewport_delh_vec, -i);
             vec3 pixelij_clr = {0,0,0};
 
             for(int sample = 0;sample<sample_per_pixel; sample++){// Anti-aliasing..
-                vec3 pixel_cords = add(pixelij_pos, 
-                    add(multiply_const(viewport_delw_vec,random_double(-0.5, 0.5)), multiply_const(viewport_delh_vec,random_double(-0.5, 0.5))));
+                vec3 pixel_cords = pixelij_pos + multiply_const(viewport_delw_vec,random_double(-0.5, 0.5)) + multiply_const(viewport_delh_vec,random_double(-0.5, 0.5));
                 vec3 ray_ij_dirc = unit_vector(sub(pixel_cords, camera_pos));
                 int depth = 0;
                 vec3 clr = ray_color(Objects, {ray_ij_dirc, camera_pos}, depth, MEDIUM_REFACTIVE_INDEX);
 
-                pixelij_clr = add(pixelij_clr, clr);
+                pixelij_clr = pixelij_clr + clr;
                 
             }
             double sample_inv_const = 1.0/sample_per_pixel;

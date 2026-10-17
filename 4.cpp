@@ -6,15 +6,27 @@ using namespace std;
 #define MAX_BOUNCE_LIMIT 50//max bounce limit for any ray...
 #define Height 337.0
 #define Width  600.0
+
+/* --- Material Types ---*/
 #define LAMBERTIAN 1
 #define METAL 2
 #define GLASS 3
+/* --- Material Types ---*/
+
+/* --- Texture Types ---*/
+#define SOLID_COLOR 1
+#define CHECKER_TEXTURE 2
+#define IMAGE_TEXTURE 3
+/* --- Texture Types ---*/
+
 #define MEDIUM_REFACTIVE_INDEX 1
 #define pi 3.14
 #define shutter_time 0.25
 
 struct vec3 {
     double x,y,z;
+    vec3() = default;
+    vec3(double x, double y, double z): x(x), y(y), z(z) {}
 
     vec3 operator+(const vec3 &other){
         return {x+other.x, y+other.y, z+other.z};
@@ -35,24 +47,6 @@ struct Ray{
     vec3 ray_dirc;
     vec3 ray_origin;//point of origin
 };
-
-struct Sphere{/*int material;
-    double fuzz;
-    double r_index;
-    vec3 st_center = {0,0,0};
-    vec3 curr_center = {0,0,0};
-    double radius = 0;
-    vec3 clr = {0,0,0};//in 0.0 to 1.0.... 
-    vec3 vel = {0,0,0};
-    */
-    int material;
-    double fuzz;
-    double r_index;
-    vec3 st_center = {0,0,0};
-    double radius = 0;
-    vec3 clr = {0,0,0};//in 0.0 to 1.0.... 
-    vec3 vel = {0,0,0};
-};
 struct Hit_info{ // struct returned by ray_clr_helper
     bool hit;
     vec3 color;
@@ -62,6 +56,49 @@ struct Hit_info{ // struct returned by ray_clr_helper
     double fuzz;
     double r_index;
 };
+struct Texture_info{
+    int Texture_type = SOLID_COLOR;
+    vec3 clr = {0,0,0}; //solid 
+    vec3 clr1 = {0,0,0}; //checker 
+    vec3 clr2 = {1,1,1}; //checker 
+    string image_path = ""; //image texture
+
+    Texture_info() = default;
+
+    Texture_info(int type, vec3 clr): Texture_type(type), clr(clr) {}
+
+    Texture_info(int type, vec3 clr1, vec3 clr2): Texture_type(type), clr1(clr1), clr2(clr2) {}
+
+    vec3 give_color(const struct Hit_info &hit_info) const {
+        if(Texture_type == 1){
+            return clr;
+        }else if(Texture_type == 2){
+            int parity = floor(hit_info.hit_point.x) + floor(hit_info.hit_point.y) + floor(hit_info.hit_point.z);
+        
+            if(parity % 2 == 0) return clr1;
+            else return clr2;    
+        }else if(Texture_type == 3){
+
+        }
+        return {0,0,0}; // default
+    }
+};
+
+struct Sphere{
+    int material;
+    double fuzz;
+    double r_index;
+    vec3 st_center = {0,0,0};
+    double radius = 0;
+    struct Texture_info texture_info; //for textures can use a fuction in place of this
+    vec3 vel = {0,0,0};
+
+    Sphere() = default;
+    Sphere(int mat, double f, double ri, vec3 center, double r, Texture_info tex, vec3 v = {0, 0, 0})
+        : material(mat), fuzz(f), r_index(ri), st_center(center), radius(r), texture_info(tex), vel(v) {}
+};
+
+
 
 double length(vec3 vec){
     double length_sq = vec.x*vec.x + vec.y*vec.y + vec.z*vec.z;
@@ -172,9 +209,9 @@ Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray, double ray_time){
 
     double min_dist = 1e9;
     vec3 color, hit_point, unit_normal_vec;
-    int material = -1;
-    double fuzz;
-    double r_index;
+    
+    struct Sphere nearest_obj = Obj[0];
+    
     for(int i=0;i<Obj.size();i++){
         vec3 curr_pos = Obj[i].st_center + Obj[i].vel * ray_time;
         auto hit_info = hit_sphere(Obj[i], ray, ray_time);
@@ -183,10 +220,8 @@ Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray, double ray_time){
             
             if(curr_dist < min_dist){
 
-                color = Obj[i].clr;
-                fuzz = Obj[i].fuzz;
-                material = Obj[i].material;
-                r_index = Obj[i].r_index;
+                nearest_obj = Obj[i];
+
                 hit_point = hit_info.second;
                 unit_normal_vec = unit_vector(hit_info.second - curr_pos);
                 min_dist = curr_dist;
@@ -197,19 +232,18 @@ Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray, double ray_time){
         }
     }
     struct Hit_info hit_info;
-    hit_info.color = color;
     hit_info.normal = unit_normal_vec;
     hit_info.hit_point = hit_point; 
-    hit_info.material = material;
-    hit_info.fuzz = fuzz;
-    hit_info.r_index = r_index;
+    hit_info.material = nearest_obj.material;
+    hit_info.fuzz = nearest_obj.fuzz;
+    hit_info.r_index = nearest_obj.r_index;
     if(min_dist != 1e9){
-        hit_info.hit = true;
-        return hit_info;   
+        hit_info.color = nearest_obj.texture_info.give_color(hit_info);
+        hit_info.hit = true;  
+    }else{
+        hit_info.hit = false;
+        hit_info.color = default_clr;
     }
-    hit_info.hit = false;
-    hit_info.color = default_clr;
-
     return hit_info;//check here.. (default values ?)
 }
 
@@ -298,116 +332,97 @@ vec3 random_color(double minn, double maxx){
     };
 }
 
-
 void Init_Objs(vector<Sphere> &Objects){
     // Ground sphere
-    Objects.push_back({
+    Objects.push_back(Sphere(
         LAMBERTIAN,
         0.0,
         0.0,
-        {0, -1000, 0},
+        vec3(0, -1000, 0), // <-- Explicit vec3
         1000,
-        {0.7, 0.7, 0.7},
-        {0,0,0}
-    });
+        Texture_info(2, vec3(0.7, 0.7, 0.7), vec3(0,1,0)), // <-- Explicit vec3
+        vec3(0,0,0) // <-- Explicit vec3
+    )); 
 
     // Small random spheres
     for (int a = -11; a <= 11; a++) {
         for (int b = -11; b <= 11; b++) {
-
             double choose_mat = random_double(0.0, 1.0);
+            vec3 center(a + 0.9 * random_double(0.0, 1.0),
+                        0.2,
+                        b + 0.9 * random_double(0.0, 1.0)); // <-- Explicit vec3
 
-            vec3 center = {
-                a + 0.9 * random_double(0.0, 1.0),
-                0.2,
-                b + 0.9 * random_double(0.0, 1.0)
-            };
-
-            // Keep the small spheres away from the large sphere at (4, 0.2, 0)
-            vec3 reference = {4, 0.2, 0};
-
-            if (length(center - reference) < 0.9) {
-                continue;
-            }
+            vec3 reference(4, 0.2, 0); // <-- Explicit vec3
+            if (length(center - reference) < 0.9) continue;
 
             if (choose_mat < 0.8) {
                 // Diffuse material
-                Objects.push_back({
+                Objects.push_back(Sphere( 
                     LAMBERTIAN,
                     0.0,
                     0.0,
                     center,
                     0.2,
-                    multiply(
-                        random_color(0.5, 1.0),
-                        random_color(0.2, 1.0)
-                    ),
-                    {0,1,0}
-                });
-
+                    Texture_info(1, multiply(random_color(0.5, 1.0), random_color(0.2, 1.0))),
+                    vec3(0,1,0) // <-- Already explicit
+                ));
             } else if (choose_mat < 0.95) {
                 // Metal material
-                Objects.push_back({
+                Objects.push_back(Sphere(
                     METAL,
                     random_double(0.0, 0.5),
                     0.0,
                     center,
                     0.2,
-                    random_color(0.5, 1.0),
-                    {0,0,0}
-                });
-
+                    Texture_info(1, random_color(0.5, 1.0)),
+                    vec3(0,0,0) // <-- Explicit vec3
+                ));
             } else {
                 // Glass material
-                Objects.push_back({
+                Objects.push_back(Sphere(
                     GLASS,
                     0.0,
                     1.5,
                     center,
                     0.2,
-                    {1.0, 1.0, 1.0},
-                    {0,0,0}
-                });
+                    Texture_info(1, vec3(1.0, 1.0, 1.0)), // <-- Explicit vec3
+                    vec3(0,0,0) // <-- Explicit vec3
+                ));
             }
         }
     }
 
     // Three large spheres
-
-    // Center: glass
-    Objects.push_back({
+    Objects.push_back(Sphere(
         GLASS,
         0.0,
         1.5,
-        {0, 1, 0},
+        vec3(0, 1, 0), // <-- Already explicit
         1.0,
-        {1.0, 1.0, 1.0},
-        {0,0,0}
-    });
+        Texture_info(1, vec3(1.0, 1.0, 1.0)), // <-- Explicit vec3
+        vec3(0,0,0) // <-- Explicit vec3
+    ));
 
-    // Left: diffuse
-    Objects.push_back({
+    Objects.push_back(Sphere(
         LAMBERTIAN,
         0.0,
         0.0,
-        {-4, 1, 0},
+        vec3(-4, 1, 0), // <-- Explicit vec3
         1.0,
-        {0.4, 0.2, 0.1},
-        {0,0,0}
-    });
+        Texture_info(1, vec3(0.4, 0.2, 0.1)), // <-- Explicit vec3
+        vec3(0,0,0) // <-- Explicit vec3
+    ));
 
-    // Right: metal
-    Objects.push_back({
+    Objects.push_back(Sphere(
         METAL,
         0.0,
         0.0,
-        {4, 1, 0},
+        vec3(4, 1, 0), // <-- Explicit vec3
         1.0,
-        {0.7, 0.6, 0.5},
-        {0,0,0}
-    });
+        Texture_info(1, vec3(0.7, 0.6, 0.5)), // <-- Explicit vec3
+        vec3(0,0,0) // <-- Explicit vec3
+    ));
 }
-
 void StartTimer(){
     // --- START TIMER ---
     starttime = chrono::high_resolution_clock::now();
