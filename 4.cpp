@@ -1,11 +1,13 @@
 //lambertinian distribution try...
 #include <bits/stdc++.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include </home/divyansh/Ray_Tracer/stb_image.h>
 
 using namespace std;
-#define sample_per_pixel 500
+#define sample_per_pixel 50
 #define MAX_BOUNCE_LIMIT 50//max bounce limit for any ray...
-#define Height 337.0
-#define Width  600.0
+#define Height 512.0
+#define Width  512.0
 
 /* --- Material Types ---*/
 #define LAMBERTIAN 1
@@ -55,30 +57,58 @@ struct Hit_info{ // struct returned by ray_clr_helper
     int material; // 1 -> lambertian, 2 -> metals,  
     double fuzz;
     double r_index;
+    double u, v;
 };
 struct Texture_info{
     int Texture_type = SOLID_COLOR;
     vec3 clr = {0,0,0}; //solid 
     vec3 clr1 = {0,0,0}; //checker 
-    vec3 clr2 = {1,1,1}; //checker 
-    string image_path = ""; //image texture
+    vec3 clr2 = {1,1,1}; //checker
+    double scale = 1.0; //checker 
+
+    const char* filename = nullptr; //image texture
+    unsigned char* data = nullptr;
+    int width = 0;
+    int height = 0;
 
     Texture_info() = default;
 
     Texture_info(int type, vec3 clr): Texture_type(type), clr(clr) {}
 
-    Texture_info(int type, vec3 clr1, vec3 clr2): Texture_type(type), clr1(clr1), clr2(clr2) {}
+    Texture_info(int type, vec3 clr1, vec3 clr2, double scale): Texture_type(type), clr1(clr1), clr2(clr2), scale(scale) {}
+
+    Texture_info(int type, const char* image_path): Texture_type(type), filename(image_path) {
+        int comps_pre_pixel = 3;
+        data = stbi_load(filename, &width, &height, &comps_pre_pixel, 3);
+        //Error Handeling
+    }   
+
 
     vec3 give_color(const struct Hit_info &hit_info) const {
         if(Texture_type == 1){
             return clr;
         }else if(Texture_type == 2){
-            int parity = floor(hit_info.hit_point.x) + floor(hit_info.hit_point.y) + floor(hit_info.hit_point.z);
+            int parity = floor(hit_info.hit_point.x * 1/scale) 
+            +floor(hit_info.hit_point.y * 1/scale)
+            +floor(hit_info.hit_point.z * 1/scale);
         
             if(parity % 2 == 0) return clr1;
             else return clr2;    
-        }else if(Texture_type == 3){
+        }else if(Texture_type == 3){       
+             
+            int i = hit_info.u * width;
+            int j = hit_info.v * height;
+            if(i >= width)i = width-1;
+            if(j >= height)j = height-1;
+            int bytes_per_scanline = 3 * width;
 
+            unsigned char *pixel_data = data + bytes_per_scanline*j + i*3;
+
+            return {
+                pixel_data[0] * 1.0/255.0,
+                pixel_data[1] * 1.0/255.0,
+                pixel_data[2] * 1.0/255.0
+            };
         }
         return {0,0,0}; // default
     }
@@ -194,6 +224,15 @@ pair<bool, vec3> hit_sphere(Sphere s, Ray ray, double ray_time){
     return {false, {}};
 }
 
+void get_u_v(struct Hit_info &hit_info, double radius){// returns {u,v} cords for a given hit_point for an Image_Texture
+    double phi = atan2(hit_info.normal.x, hit_info.normal.z) + pi;
+    double theta = acos(hit_info.normal.y);
+
+    hit_info.u = phi/(2*pi);
+    hit_info.v = theta / pi;
+
+}
+
 Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray, double ray_time){
     //handels the single ray for many objects..
     
@@ -210,7 +249,7 @@ Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray, double ray_time){
     double min_dist = 1e9;
     vec3 color, hit_point, unit_normal_vec;
     
-    struct Sphere nearest_obj = Obj[0];
+    struct Sphere nearest_obj;
     
     for(int i=0;i<Obj.size();i++){
         vec3 curr_pos = Obj[i].st_center + Obj[i].vel * ray_time;
@@ -237,7 +276,9 @@ Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray, double ray_time){
     hit_info.material = nearest_obj.material;
     hit_info.fuzz = nearest_obj.fuzz;
     hit_info.r_index = nearest_obj.r_index;
+
     if(min_dist != 1e9){
+        get_u_v(hit_info, nearest_obj.radius);
         hit_info.color = nearest_obj.texture_info.give_color(hit_info);
         hit_info.hit = true;  
     }else{
@@ -332,7 +373,7 @@ vec3 random_color(double minn, double maxx){
     };
 }
 
-void Init_Objs(vector<Sphere> &Objects){
+void Scene1(vector<Sphere> &Objects){
     // Ground sphere
     Objects.push_back(Sphere(
         LAMBERTIAN,
@@ -340,7 +381,7 @@ void Init_Objs(vector<Sphere> &Objects){
         0.0,
         vec3(0, -1000, 0), // <-- Explicit vec3
         1000,
-        Texture_info(2, vec3(0.7, 0.7, 0.7), vec3(0,1,0)), // <-- Explicit vec3
+        Texture_info(2, vec3(0.7, 0.7, 0.7), vec3(0,1,0), 0.5), // <-- Explicit vec3
         vec3(0,0,0) // <-- Explicit vec3
     )); 
 
@@ -423,6 +464,18 @@ void Init_Objs(vector<Sphere> &Objects){
         vec3(0,0,0) // <-- Explicit vec3
     ));
 }
+
+void Scene2(vector<Sphere> &Objects){
+    Objects.push_back(
+        Sphere(
+            LAMBERTIAN,
+            0.0, 0.0, vec3(0,0,-2),
+            0.25,
+            Texture_info(IMAGE_TEXTURE, "/home/divyansh/Ray_Tracer/earth.png"),
+            vec3(0, 0, 0)
+        )
+    );
+}
 void StartTimer(){
     // --- START TIMER ---
     starttime = chrono::high_resolution_clock::now();
@@ -455,7 +508,7 @@ int main()
     
     vector<Sphere> Objects;
 
-    Init_Objs(Objects);
+    Scene2(Objects);
     
     double focal_length = 1.0;
     double fov = pi/6;// horizontal fov
@@ -466,9 +519,9 @@ int main()
     double viewport_delw = viewport_Width/Width;
     double viewport_delh = viewport_Height / Height;
 
-    vec3 camera_pos = {13,2,3};
+    vec3 camera_pos = {0,0,0}; //{13,2,3};
     vec3 vup = {0,1,0}; // MUST BE UNIT VEC
-    vec3 lookat = unit_vector({-3,-0.25,-1}); // MUST BE UNIT VEC
+    vec3 lookat = unit_vector({0,0,-1});//unit_vector({-3,-0.25,-1}); // MUST BE UNIT VEC
 
     vec3 u = unit_vector(cross_product(lookat, vup));
     vec3 v = unit_vector(cross_product(u, lookat));
@@ -517,5 +570,3 @@ int main()
     return 0;
 }
 
-//TODO: Schlick Approximation for GLASS rendering
-//Defocus Blur
