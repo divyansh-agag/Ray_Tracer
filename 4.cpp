@@ -1,7 +1,7 @@
 //lambertinian distribution try...
 #include <bits/stdc++.h>
 #define STB_IMAGE_IMPLEMENTATION
-#include </home/divyansh/Ray_Tracer/stb_image.h>
+#include </home/divyansh/Ray_Tracer/external/stb_image.h>
 
 using namespace std;
 #define sample_per_pixel 50
@@ -65,7 +65,8 @@ struct Texture_info{
     vec3 clr1 = {0,0,0}; //checker 
     vec3 clr2 = {1,1,1}; //checker
     double scale = 1.0; //checker 
-
+    double longitudnal_phase = 0.0; // [0, 2*pi] Y-AXIS
+    double latitunal_phase = 0.0; // [0, pi] X-AXIS
     const char* filename = nullptr; //image texture
     unsigned char* data = nullptr;
     int width = 0;
@@ -77,8 +78,10 @@ struct Texture_info{
 
     Texture_info(int type, vec3 clr1, vec3 clr2, double scale): Texture_type(type), clr1(clr1), clr2(clr2), scale(scale) {}
 
-    Texture_info(int type, const char* image_path): Texture_type(type), filename(image_path) {
+    Texture_info(int type, const char* image_path, double latitunal_phase, double longitudnal_phase): Texture_type(type), filename(image_path), latitunal_phase(latitunal_phase), longitudnal_phase(longitudnal_phase) {
         int comps_pre_pixel = 3;
+        clamp(latitunal_phase, 0.0, pi); 
+        clamp(longitudnal_phase, 0.0, 2*pi);
         data = stbi_load(filename, &width, &height, &comps_pre_pixel, 3);
         //Error Handeling
     }   
@@ -96,8 +99,8 @@ struct Texture_info{
             else return clr2;    
         }else if(Texture_type == 3){       
              
-            int i = hit_info.u * width;
-            int j = hit_info.v * height;
+            int i = (int)(hit_info.u * width + longitudnal_phase*width/(2*pi))%width;
+            int j = (int)(hit_info.v * height + latitunal_phase*height/(pi))%height;
             if(i >= width)i = width-1;
             if(j >= height)j = height-1;
             int bytes_per_scanline = 3 * width;
@@ -471,7 +474,7 @@ void Scene2(vector<Sphere> &Objects){
             LAMBERTIAN,
             0.0, 0.0, vec3(0,0,-2),
             0.25,
-            Texture_info(IMAGE_TEXTURE, "/home/divyansh/Ray_Tracer/earth.png"),
+            Texture_info(IMAGE_TEXTURE, "/home/divyansh/Ray_Tracer/images/earth.jpg", 0.8*pi, pi/2),
             vec3(0, 0, 0)
         )
     );
