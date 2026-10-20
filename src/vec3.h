@@ -6,13 +6,13 @@ struct vec3 {
     vec3() = default;
     vec3(double x, double y, double z): x(x), y(y), z(z) {}
 
-    vec3 operator+(const vec3 &other){
+    vec3 operator+(const vec3 &other) const{
         return {x+other.x, y+other.y, z+other.z};
     }
-    vec3 operator-(const vec3 &other){
+    vec3 operator-(const vec3 &other) const{
         return {x-other.x, y-other.y, z-other.z};
     }
-    vec3 operator*(double scaler){
+    vec3 operator*(const double scaler) const{
         return {x*scaler, y*scaler, z*scaler};
     }
 

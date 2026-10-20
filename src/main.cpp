@@ -5,6 +5,8 @@
 #include "vec3.h"
 #include "random.h"
 #include "texture.h"
+#include "ray.h"
+#include "hittable.h"
 
 
 using namespace std;
@@ -13,11 +15,11 @@ using namespace std;
 #define Height 512.0
 #define Width  512.0
 
-/* --- Material Types ---*/
-#define LAMBERTIAN 1
-#define METAL 2
-#define GLASS 3
-/* --- Material Types ---*/
+/* --- Material Types --- */
+#define LAMBERTIAN 1 
+#define METAL 2 
+#define GLASS 3 
+/* --- Material Types --- */
 
 
 
@@ -29,82 +31,7 @@ using namespace std;
 vector<vec3> image(Width * Height);
 std::chrono::high_resolution_clock::time_point starttime; 
 
-struct Ray{
-    vec3 ray_dirc;
-    vec3 ray_origin;//point of origin
-};
-
-struct Sphere{
-    int material;
-    double fuzz;
-    double r_index;
-    vec3 st_center = {0,0,0};
-    double radius = 0;
-    struct Texture_info texture_info; //for textures can use a fuction in place of this
-    vec3 vel = {0,0,0};
-
-    Sphere() = default;
-    Sphere(int mat, double f, double ri, vec3 center, double r, Texture_info tex, vec3 v = {0, 0, 0})
-        : material(mat), fuzz(f), r_index(ri), st_center(center), radius(r), texture_info(tex), vel(v) {}
-};
-
-
-
-vec3 genrate_random_dirc(){
-    int limit = 10;
-    for(int i = 0;i < limit;i++){
-        double x = random_double(-1, 1);
-        double y = random_double(-1, 1);
-        double z = random_double(-1, 1);
-        if(abs(x)<1e-60 || abs(y)<1e-60 || abs(z)<1e-60) continue;
-        if(x*x + y*y + z*z <= 1) return unit_vector({x,y,z});
-    }
-    return unit_vector({0.5, 0.5, 0.5});
-
-}
-
-vec3 random_vector_hemisphere(vec3 normal){
-    //returns a random vector inside the hemisphere which has  ->  normal.vec >= 0 
-    vec3 random_dirc = genrate_random_dirc();
-    if(dot_product(normal, random_dirc) >= 0) return random_dirc;
-    else return random_dirc * -1;
-}
-
-
-pair<bool, vec3> hit_sphere(Sphere s, Ray ray, double ray_time){
-    // returns bool for hit / not hit and if hit 2 points where ray hits the sphere..
-    vec3 curr_pos = s.st_center + s.vel * ray_time;
-    auto b = -2*dot_product(ray.ray_dirc, curr_pos - ray.ray_origin);
-    auto c = dot_product(curr_pos - ray.ray_origin, curr_pos - ray.ray_origin) - (s.radius*s.radius);
-    
-    auto disc = b*b - 4*c;
-    if(disc>=0){
-        auto disc_root = sqrt(disc);
-        double t1 = (-b - disc_root)/2;
-        double t2 = (-b + disc_root)/2;
-        if(t1<0 && t2<0)return {false, {}}; // check so that only t>0 considered so that we only view obj in front of camera..
-
-
-        vec3 point1 = ray.ray_origin + ray.ray_dirc * t1;
-        vec3 point2 = ray.ray_origin + ray.ray_dirc * t2;
-
-        if(t1 > 0.001) return {true, point1};
-        if(t2 > 0.001) return {true, point2};
-        
-    }
-    return {false, {}};
-}
-
-void get_u_v(struct Hit_info &hit_info, double radius){// returns {u,v} cords for a given hit_point for an Image_Texture
-    double phi = atan2(hit_info.normal.x, hit_info.normal.z) + pi;
-    double theta = acos(hit_info.normal.y);
-
-    hit_info.u = phi/(2*pi);
-    hit_info.v = theta / pi;
-
-}
-
-Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray, double ray_time){
+Hit_info ray_color_helper(vector<shared_ptr<Hittable>> &Obj, Ray ray, double ray_time){
     //handels the single ray for many objects..
     
     //returns clr in 0.0 to 1.0 range and the normal vector where ray hits and also the point where ray hits the object ...
@@ -119,42 +46,13 @@ Hit_info ray_color_helper(vector<Sphere> &Obj, Ray ray, double ray_time){
 
     double min_dist = 1e9;
     vec3 color, hit_point, unit_normal_vec;
-    
-    struct Sphere nearest_obj;
-    
-    for(int i=0;i<Obj.size();i++){
-        vec3 curr_pos = Obj[i].st_center + Obj[i].vel * ray_time;
-        auto hit_info = hit_sphere(Obj[i], ray, ray_time);
-        if(hit_info.first){
-            auto curr_dist = length(hit_info.second - ray.ray_origin);
-            
-            if(curr_dist < min_dist){
 
-                nearest_obj = Obj[i];
-
-                hit_point = hit_info.second;
-                unit_normal_vec = unit_vector(hit_info.second - curr_pos);
-                min_dist = curr_dist;
-            }
-            
-            //return {max(0.0, unit_normal_vec.x), max(0.0, unit_normal_vec.y), max(0.0, unit_normal_vec.z*0.5)};
-            
-        }
-    }
     struct Hit_info hit_info;
-    hit_info.normal = unit_normal_vec;
-    hit_info.hit_point = hit_point; 
-    hit_info.material = nearest_obj.material;
-    hit_info.fuzz = nearest_obj.fuzz;
-    hit_info.r_index = nearest_obj.r_index;
-
-    if(min_dist != 1e9){
-        get_u_v(hit_info, nearest_obj.radius);
-        hit_info.color = nearest_obj.texture_info.give_color(hit_info);
-        hit_info.hit = true;  
-    }else{
-        hit_info.hit = false;
-        hit_info.color = default_clr;
+    hit_info.hit = false;
+    hit_info.dist = 1e9;
+    hit_info.color = default_clr;
+    for(auto obj: Obj){
+        obj->hit(ray, hit_info, ray_time);
     }
     return hit_info;//check here.. (default values ?)
 }
@@ -169,7 +67,7 @@ void reflect(struct Ray &ray, struct Hit_info &hit_info, bool tir){
     ray.ray_dirc = unit_vector(ray.ray_dirc + (N_star * 2) + fuzz_vector);
 }
 
-vec3 ray_color(vector<Sphere> &Obj, Ray ray, int depth, double curr_ref_index, double ray_time){// will call this fxn for lambertian materials..
+vec3 ray_color(vector<shared_ptr<Hittable>> &Obj, Ray ray, int depth, double curr_ref_index, double ray_time){// will call this fxn for lambertian materials..
     //this will return the color for the ray 
 
     depth++;
@@ -236,109 +134,146 @@ void print_color(vec3 clr){
     int bi = (int)(255.99 * clr.z);       
     cout<<ri<<" "<<gi<<" "<<bi<<"\n";
 }
-vec3 random_color(double minn, double maxx){
-    return{
-        random_double(minn, maxx),
-        random_double(minn, maxx),
-        random_double(minn, maxx)
-    };
-}
 
-void Scene1(vector<Sphere> &Objects){
+
+void Scene1(vector<shared_ptr<Hittable>>& Objects) {
     // Ground sphere
-    Objects.push_back(Sphere(
-        LAMBERTIAN,
-        0.0,
-        0.0,
-        vec3(0, -1000, 0), // <-- Explicit vec3
-        1000,
-        Texture_info(2, vec3(0.7, 0.7, 0.7), vec3(0,1,0), 0.5), // <-- Explicit vec3
-        vec3(0,0,0) // <-- Explicit vec3
-    )); 
+    Objects.push_back(
+        make_shared<Sphere>(
+            LAMBERTIAN,
+            0.0,
+            0.0,
+            vec3(0, -1000, 0),
+            1000,
+            Texture_info(2, vec3(0.7, 0.7, 0.7), vec3(0, 1, 0), 0.5),
+            vec3(0, 0, 0)
+        )
+    );
 
     // Small random spheres
     for (int a = -11; a <= 11; a++) {
         for (int b = -11; b <= 11; b++) {
             double choose_mat = random_double(0.0, 1.0);
-            vec3 center(a + 0.9 * random_double(0.0, 1.0),
-                        0.2,
-                        b + 0.9 * random_double(0.0, 1.0)); // <-- Explicit vec3
 
-            vec3 reference(4, 0.2, 0); // <-- Explicit vec3
-            if (length(center - reference) < 0.9) continue;
+            vec3 center(
+                a + 0.9 * random_double(0.0, 1.0),
+                0.2,
+                b + 0.9 * random_double(0.0, 1.0)
+            );
+
+            vec3 reference(4, 0.2, 0);
+
+            if (length(center - reference) < 0.9)
+                continue;
 
             if (choose_mat < 0.8) {
                 // Diffuse material
-                Objects.push_back(Sphere( 
-                    LAMBERTIAN,
-                    0.0,
-                    0.0,
-                    center,
-                    0.2,
-                    Texture_info(1, multiply(random_color(0.5, 1.0), random_color(0.2, 1.0))),
-                    vec3(0,1,0) // <-- Already explicit
-                ));
-            } else if (choose_mat < 0.95) {
+                Objects.push_back(
+                    make_shared<Sphere>(
+                        LAMBERTIAN,
+                        0.0,
+                        0.0,
+                        center,
+                        0.2,
+                        Texture_info(
+                            1,
+                            multiply(
+                                random_color(0.5, 1.0),
+                                random_color(0.2, 1.0)
+                            )
+                        ),
+                        vec3(0, 1, 0)
+                    )
+                );
+            }
+            else if (choose_mat < 0.95) {
                 // Metal material
-                Objects.push_back(Sphere(
-                    METAL,
-                    random_double(0.0, 0.5),
-                    0.0,
-                    center,
-                    0.2,
-                    Texture_info(1, random_color(0.5, 1.0)),
-                    vec3(0,0,0) // <-- Explicit vec3
-                ));
-            } else {
+                Objects.push_back(
+                    make_shared<Sphere>(
+                        METAL,
+                        random_double(0.0, 0.5),
+                        0.0,
+                        center,
+                        0.2,
+                        Texture_info(
+                            1,
+                            random_color(0.5, 1.0)
+                        ),
+                        vec3(0, 0, 0)
+                    )
+                );
+            }
+            else {
                 // Glass material
-                Objects.push_back(Sphere(
-                    GLASS,
-                    0.0,
-                    1.5,
-                    center,
-                    0.2,
-                    Texture_info(1, vec3(1.0, 1.0, 1.0)), // <-- Explicit vec3
-                    vec3(0,0,0) // <-- Explicit vec3
-                ));
+                Objects.push_back(
+                    make_shared<Sphere>(
+                        GLASS,
+                        0.0,
+                        1.5,
+                        center,
+                        0.2,
+                        Texture_info(
+                            1,
+                            vec3(1.0, 1.0, 1.0)
+                        ),
+                        vec3(0, 0, 0)
+                    )
+                );
             }
         }
     }
 
     // Three large spheres
-    Objects.push_back(Sphere(
-        GLASS,
-        0.0,
-        1.5,
-        vec3(0, 1, 0), // <-- Already explicit
-        1.0,
-        Texture_info(1, vec3(1.0, 1.0, 1.0)), // <-- Explicit vec3
-        vec3(0,0,0) // <-- Explicit vec3
-    ));
 
-    Objects.push_back(Sphere(
-        LAMBERTIAN,
-        0.0,
-        0.0,
-        vec3(-4, 1, 0), // <-- Explicit vec3
-        1.0,
-        Texture_info(1, vec3(0.4, 0.2, 0.1)), // <-- Explicit vec3
-        vec3(0,0,0) // <-- Explicit vec3
-    ));
+    // Glass sphere
+    Objects.push_back(
+        make_shared<Sphere>(
+            GLASS,
+            0.0,
+            1.5,
+            vec3(0, 1, 0),
+            1.0,
+            Texture_info(1, vec3(1.0, 1.0, 1.0)),
+            vec3(0, 0, 0)
+        )
+    );
 
-    Objects.push_back(Sphere(
-        METAL,
-        0.0,
-        0.0,
-        vec3(4, 1, 0), // <-- Explicit vec3
-        1.0,
-        Texture_info(1, vec3(0.7, 0.6, 0.5)), // <-- Explicit vec3
-        vec3(0,0,0) // <-- Explicit vec3
-    ));
+    // Diffuse sphere
+    Objects.push_back(
+        make_shared<Sphere>(
+            LAMBERTIAN,
+            0.0,
+            0.0,
+            vec3(-4, 1, 0),
+            1.0,
+            Texture_info(1, vec3(0.4, 0.2, 0.1)),
+            vec3(0, 0, 0)
+        )
+    );
+
+    // Metal sphere
+    Objects.push_back(
+        make_shared<Sphere>(
+            METAL,
+            0.0,
+            0.0,
+            vec3(4, 1, 0),
+            1.0,
+            Texture_info(1, vec3(0.7, 0.6, 0.5)),
+            vec3(0, 0, 0)
+        )
+    );
+    /*
+    CAMERA SETUP FOR THIS SCENE
+        vec3 camera_pos =  {10,2,2};
+    vec3 vup = {0,1,0}; // MUST BE UNIT VEC
+    vec3 lookat = unit_vector({-1,0,-1}); // MUST BE UNIT VEC
+    */
 }
 
-void Scene2(vector<Sphere> &Objects){
+void Scene2(vector<shared_ptr<Hittable>> &Objects){
     Objects.push_back(
-        Sphere(
+        make_shared<Sphere>(
             LAMBERTIAN,
             0.0, 0.0, vec3(0,-1000,-2),
             1000,
@@ -347,14 +282,77 @@ void Scene2(vector<Sphere> &Objects){
         )
     );
     Objects.push_back(
-        Sphere(
+        make_shared<Sphere>(
             LAMBERTIAN,
             0.0, 0.0, vec3(0,0.25,-2),
             0.25,
             Texture_info(RANDOM_TEXTURE, 256, 0.1),
-            vec3(0, 0, 0)
+            vec3(0, 0, 0)   
         )
     );
+}
+
+void Scene3(vector<shared_ptr<Hittable>> &Objects){
+
+    // Materials / colors
+    Texture_info left_red(1, vec3(1.0, 0.2, 0.2));
+    Texture_info back_green(1, vec3(0.2, 1.0, 0.2));
+    Texture_info right_blue(1, vec3(0.2, 0.2, 1.0));
+    Texture_info upper_orange(1, vec3(0.8, 0.8, 0.8));
+    Texture_info lower_teal(1, vec3(0.2, 0.8, 0.8));
+
+    // Five quads from the book
+
+    // Left: red
+    auto left = make_shared<Quad>(
+        vec3(-3, -2, 5),
+        vec3(0, 0, -4),
+        vec3(0, 4, 0),
+        LAMBERTIAN, 0 
+    );
+    left->texture_info = left_red;
+    Objects.push_back(left);
+
+    // Back: green
+    auto back = make_shared<Quad>(
+        vec3(-2, -2, 0),
+        vec3(4, 0, 0),
+        vec3(0, 4, 0),
+        LAMBERTIAN, 0
+    );
+    back->texture_info = back_green;
+    Objects.push_back(back);
+
+    // Right: blue
+    auto right = make_shared<Quad>(
+        vec3(3, -2, 1),
+        vec3(0, 0, 4),
+        vec3(0, 4, 0),
+        LAMBERTIAN, 0
+    );
+    right->texture_info = right_blue;
+    Objects.push_back(right);
+
+    // Upper: orange
+    auto upper = make_shared<Quad>(
+        vec3(-2, 3, 1),
+        vec3(4, 0, 0),
+        vec3(0, 0, 4),
+        METAL, 0
+    );
+    upper->texture_info = upper_orange;
+    Objects.push_back(upper);
+
+    // Lower: teal
+    auto lower = make_shared<Quad>(
+        vec3(-2, -3, 5),
+        vec3(4, 0, 0),
+        vec3(0, 0, -4),
+        LAMBERTIAN, 0
+    );
+    lower->texture_info = lower_teal;
+    Objects.push_back(lower);
+
 }
 void StartTimer(){
     // --- START TIMER ---
@@ -383,15 +381,14 @@ int main()
     cout << "P3\n"
         << Width << " " << Height << "\n"
         << "255\n";
-
     
     
-    vector<Sphere> Objects;
+    vector<shared_ptr<Hittable>> Objects;
 
-    Scene2(Objects);
+    Scene3(Objects);
     
     double focal_length = 1.0;
-    double fov = pi/6;// horizontal fov
+    double fov = pi/2;// horizontal fov
     
     double viewport_Width = 2 * tan(fov/2) * focal_length;
     double viewport_Height = (Height/Width)*viewport_Width;
@@ -399,9 +396,9 @@ int main()
     double viewport_delw = viewport_Width/Width;
     double viewport_delh = viewport_Height / Height;
 
-    vec3 camera_pos =  {0,0.25,0};//{13,5,3};
+    vec3 camera_pos =  {0,0,9};
     vec3 vup = {0,1,0}; // MUST BE UNIT VEC
-    vec3 lookat = unit_vector({0,0,-1});//unit_vector({-3,-0.25,-1}); // MUST BE UNIT VEC
+    vec3 lookat = unit_vector({0,0,-1}); // MUST BE UNIT VEC
 
     vec3 u = unit_vector(cross_product(lookat, vup));
     vec3 v = unit_vector(cross_product(u, lookat));

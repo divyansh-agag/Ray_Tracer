@@ -6,7 +6,6 @@
 #include "hit_info.h"
 #include "external/stb_image.h"
 #include "random.h"
-#include "texture.h"
 
 using namespace std;
 
