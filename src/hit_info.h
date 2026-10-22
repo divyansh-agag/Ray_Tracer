@@ -1,6 +1,6 @@
 
-#ifndef CALC_H
-#define CALC_H
+#ifndef HIT_INFO_H
+#define HIT_INFO_H
 #include "vec3.h"
 struct Hit_info{ // struct returned by ray_clr_helper
     bool hit;
@@ -13,6 +13,7 @@ struct Hit_info{ // struct returned by ray_clr_helper
     double fuzz;
     double r_index;
     double u, v;
+    double emmisivity;
 };
 
 #endif

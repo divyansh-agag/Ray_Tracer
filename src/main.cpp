@@ -11,7 +11,7 @@
 
 using namespace std;
 #define sample_per_pixel 500
-#define MAX_BOUNCE_LIMIT 50//max bounce limit for any ray...
+#define MAX_BOUNCE_LIMIT 10//max bounce limit for any ray...
 #define Height 512.0
 #define Width  512.0
 
@@ -31,15 +31,13 @@ using namespace std;
 vector<vec3> image(Width * Height);
 std::chrono::high_resolution_clock::time_point starttime; 
 
-Hit_info ray_color_helper(vector<shared_ptr<Hittable>> &Obj, Ray ray, double ray_time){
+Hit_info ray_color_helper(vector<shared_ptr<Hittable>> &Obj, Ray ray, double ray_time, vec3 &background_clr){
     //handels the single ray for many objects..
     
     //returns clr in 0.0 to 1.0 range and the normal vector where ray hits and also the point where ray hits the object ...
 
     //normalize ray_dirc
     ray.ray_dirc = unit_vector(ray.ray_dirc);
-    double a = 0.5*(ray.ray_dirc.y + 1.0);
-    vec3 default_clr = vec3{1.0, 1.0, 1.0} * (1.0-a) + vec3{0.5, 0.7, 1.0} * a;
 
     // want to make this so that when ever ray hits a object it takes some color of that object 
     // and 
@@ -50,7 +48,7 @@ Hit_info ray_color_helper(vector<shared_ptr<Hittable>> &Obj, Ray ray, double ray
     struct Hit_info hit_info;
     hit_info.hit = false;
     hit_info.dist = 1e9;
-    hit_info.color = default_clr;
+    hit_info.color = background_clr;
     for(auto obj: Obj){
         obj->hit(ray, hit_info, ray_time);
     }
@@ -67,18 +65,19 @@ void reflect(struct Ray &ray, struct Hit_info &hit_info, bool tir){
     ray.ray_dirc = unit_vector(ray.ray_dirc + (N_star * 2) + fuzz_vector);
 }
 
-vec3 ray_color(vector<shared_ptr<Hittable>> &Obj, Ray ray, int depth, double curr_ref_index, double ray_time){// will call this fxn for lambertian materials..
+vec3 ray_color(vector<shared_ptr<Hittable>> &Obj, Ray ray, int depth, double curr_ref_index, double ray_time, vec3 &background_clr){// will call this fxn for lambertian materials..
     //this will return the color for the ray 
 
     depth++;
     if(depth > MAX_BOUNCE_LIMIT) return {1,0,0};//can work on this part..
-    Hit_info hit_info = ray_color_helper(Obj, ray, ray_time);
+    Hit_info hit_info = ray_color_helper(Obj, ray, ray_time, background_clr);
     
     if(!hit_info.hit) {
         return hit_info.color; //if ray  misses every object returns the color of the sky
     }
     
     if(hit_info.material == LAMBERTIAN){
+        if(dot_product(ray.ray_dirc, hit_info.normal) >= 0)hit_info.normal = hit_info.normal * -1;
         ray.ray_dirc = unit_vector(hit_info.normal + genrate_random_dirc()); // lambertian distribution
     }
     else if(hit_info.material == METAL){
@@ -117,14 +116,14 @@ vec3 ray_color(vector<shared_ptr<Hittable>> &Obj, Ray ray, int depth, double cur
     }       
     // Nudge origin forward to prevent self-intersection
     ray.ray_origin = hit_info.hit_point + (ray.ray_dirc * 0.001);
-    vec3 incoming_light = ray_color(Obj, ray, depth, curr_ref_index, ray_time);
+    vec3 incoming_light = ray_color(Obj, ray, depth, curr_ref_index, ray_time, background_clr);
 
     //material albedo * incoming light
-    return {
+    return vec3(
             incoming_light.x * hit_info.color.x,
             incoming_light.y * hit_info.color.y,
             incoming_light.z * hit_info.color.z
-    }; 
+        ) + vec3(1,1,1) * hit_info.emmisivity; 
 }
 
 void print_color(vec3 clr){
@@ -298,17 +297,15 @@ void Scene3(vector<shared_ptr<Hittable>> &Objects){
     Texture_info left_red(1, vec3(1.0, 0.2, 0.2));
     Texture_info back_green(1, vec3(0.2, 1.0, 0.2));
     Texture_info right_blue(1, vec3(0.2, 0.2, 1.0));
-    Texture_info upper_orange(1, vec3(0.8, 0.8, 0.8));
+    Texture_info upper_orange(1, vec3(0.8, 0.2, 0.1));
     Texture_info lower_teal(1, vec3(0.2, 0.8, 0.8));
-
-    // Five quads from the book
 
     // Left: red
     auto left = make_shared<Quad>(
         vec3(-3, -2, 5),
         vec3(0, 0, -4),
         vec3(0, 4, 0),
-        LAMBERTIAN, 0 
+        LAMBERTIAN, 0 ,0
     );
     left->texture_info = left_red;
     Objects.push_back(left);
@@ -318,7 +315,7 @@ void Scene3(vector<shared_ptr<Hittable>> &Objects){
         vec3(-2, -2, 0),
         vec3(4, 0, 0),
         vec3(0, 4, 0),
-        LAMBERTIAN, 0
+        LAMBERTIAN, 0, 0
     );
     back->texture_info = back_green;
     Objects.push_back(back);
@@ -328,31 +325,112 @@ void Scene3(vector<shared_ptr<Hittable>> &Objects){
         vec3(3, -2, 1),
         vec3(0, 0, 4),
         vec3(0, 4, 0),
-        LAMBERTIAN, 0
+        LAMBERTIAN, 0, 0
     );
     right->texture_info = right_blue;
     Objects.push_back(right);
 
-    // Upper: orange
+    // Upper
     auto upper = make_shared<Quad>(
         vec3(-2, 3, 1),
         vec3(4, 0, 0),
         vec3(0, 0, 4),
-        METAL, 0
+        LAMBERTIAN, 0, 0
     );
     upper->texture_info = upper_orange;
     Objects.push_back(upper);
 
-    // Lower: teal
+    // Lower
     auto lower = make_shared<Quad>(
         vec3(-2, -3, 5),
         vec3(4, 0, 0),
         vec3(0, 0, -4),
-        LAMBERTIAN, 0
+        LAMBERTIAN, 0, 0
     );
     lower->texture_info = lower_teal;
     Objects.push_back(lower);
 
+    Objects.push_back(make_shared<Sphere>(LAMBERTIAN, 0, 1, vec3(0,0,1), 1, Texture_info(SOLID_COLOR, vec3(1,1,1)), vec3(0,0,0), 10));
+    //vec3 camera_pos = vec3(0, 0, 10);
+    //vec3 target = vec3(0, 0, 2);
+    
+}
+
+void Scene4(vector<shared_ptr<Hittable>> &Objects){
+    // Cornell's Box ...
+    // Materials
+    Texture_info red(
+        SOLID_COLOR,
+        vec3(0.65, 0.05, 0.05)
+    );
+
+    Texture_info green(
+        SOLID_COLOR,
+        vec3(0.12, 0.45, 0.15)
+    );
+
+    Texture_info white(
+        SOLID_COLOR,
+        vec3(0.73, 0.73, 0.73)
+    );
+
+    // Bright white ceiling light
+    Texture_info light_color(
+        SOLID_COLOR,
+        vec3(1.0, 1.0, 1.0)
+    );
+
+
+
+        // Left wall: x = 0, inward normal +x
+    Objects.push_back(make_shared<Quad>(
+        vec3(0, 0, 0),
+        vec3(0, 555, 0),
+        vec3(0, 0, 555),
+        LAMBERTIAN, 0, 0, red
+    ));
+
+    // Right wall: x = 555, inward normal -x
+    Objects.push_back(make_shared<Quad>(
+        vec3(555, 0, 0),
+        vec3(0, 0, 555),
+        vec3(0, 555, 0),
+        LAMBERTIAN, 0, 0, green
+    ));
+
+    // Ceiling: y = 555, inward normal -y
+    Objects.push_back(make_shared<Quad>(
+        vec3(555, 555, 555),
+        vec3(-555, 0, 0),
+        vec3(0, 0, -555),
+        LAMBERTIAN, 0, 0, white
+    ));
+
+    // Ceiling light: inward normal -y
+    Objects.push_back(make_shared<Quad>(
+        vec3(343, 554, 332),
+        vec3(-130, 0, 0),
+        vec3(0, 0, -105),
+        LAMBERTIAN, 0, 15, light_color
+    ));
+
+    // Floor: y = 0, inward normal +y
+    Objects.push_back(make_shared<Quad>(
+        vec3(0, 0, 0),
+        vec3(0, 0, 555),
+        vec3(555, 0, 0),
+        LAMBERTIAN, 0, 0, white
+    ));
+
+    // Back wall: z = 555, inward normal -z
+    Objects.push_back(make_shared<Quad>(
+        vec3(0, 0, 555),
+        vec3(0, 555, 0),
+        vec3(555, 0, 0),
+        LAMBERTIAN, 0, 0, white
+    ));
+    //vec3 camera_pos = vec3(278, 278, -600);
+    //vec3 target = vec3(278, 278, 0);
 }
 void StartTimer(){
     // --- START TIMER ---
@@ -385,10 +463,10 @@ int main()
     
     vector<shared_ptr<Hittable>> Objects;
 
-    Scene3(Objects);
+    Scene4(Objects);
     
     double focal_length = 1.0;
-    double fov = pi/2;// horizontal fov
+    double fov = 40*(pi/180);// horizontal fov
     
     double viewport_Width = 2 * tan(fov/2) * focal_length;
     double viewport_Height = (Height/Width)*viewport_Width;
@@ -396,9 +474,14 @@ int main()
     double viewport_delw = viewport_Width/Width;
     double viewport_delh = viewport_Height / Height;
 
-    vec3 camera_pos =  {0,0,9};
-    vec3 vup = {0,1,0}; // MUST BE UNIT VEC
-    vec3 lookat = unit_vector({0,0,-1}); // MUST BE UNIT VEC
+    vec3 camera_pos = vec3(278, 278, -600);
+    vec3 target = vec3(278, 278, 0);
+
+
+    
+    vec3 vup = vec3(0, 1, 0);
+    vec3 lookat = unit_vector(target - camera_pos);
+    vec3 background_clr  = vec3(0,0,0);
 
     vec3 u = unit_vector(cross_product(lookat, vup));
     vec3 v = unit_vector(cross_product(u, lookat));
@@ -425,7 +508,7 @@ int main()
                 vec3 pixel_cords = pixelij_pos + (viewport_delw_vec * random_double(-0.5, 0.5)) + (viewport_delh_vec * random_double(-0.5, 0.5));
                 vec3 ray_ij_dirc = unit_vector(pixel_cords - camera_pos);
                 int depth = 0;
-                vec3 clr = ray_color(Objects, {ray_ij_dirc, camera_pos}, depth, MEDIUM_REFACTIVE_INDEX, ray_time);
+                vec3 clr = ray_color(Objects, {ray_ij_dirc, camera_pos}, depth, MEDIUM_REFACTIVE_INDEX, ray_time, background_clr);
 
                 pixelij_clr = pixelij_clr + clr;
                 

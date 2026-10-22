@@ -32,7 +32,7 @@ struct Texture_info{
     // Random
     int num_points;
     double *rand_points = nullptr; // random points array
-    int *prem_x, *prem_y, *prem_z;
+    int *prem_x = nullptr, *prem_y = nullptr, *prem_z = nullptr;
     
 
 
