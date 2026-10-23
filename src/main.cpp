@@ -10,7 +10,7 @@
 
 
 using namespace std;
-#define sample_per_pixel 500
+#define sample_per_pixel 1000
 #define MAX_BOUNCE_LIMIT 10//max bounce limit for any ray...
 #define Height 512.0
 #define Width  512.0
@@ -26,6 +26,9 @@ using namespace std;
 #define MEDIUM_REFACTIVE_INDEX 1
 #define pi 3.14
 #define shutter_time 0.25
+
+atomic<int> rows_completed(0);
+mutex progress_mutex;
 
 
 vector<vec3> image(Width * Height);
@@ -431,7 +434,77 @@ void Scene4(vector<shared_ptr<Hittable>> &Objects){
     ));
     //vec3 camera_pos = vec3(278, 278, -600);
     //vec3 target = vec3(278, 278, 0);
+    //vec3 vup = vec3(0, 1, 0);
+    //vec3 lookat = unit_vector(target - camera_pos);
 }
+
+void Scene5(vector<shared_ptr<Hittable>> &Objects) {
+    // 1. Ground Plane (Grey diffuse sphere underneath)
+    Objects.push_back(
+        make_shared<Sphere>(
+            LAMBERTIAN, 0.0, 0.0,
+            vec3(0, -1000, 0), 1000.0,
+            Texture_info(SOLID_COLOR, vec3(0.5, 0.5, 0.5)),
+            vec3(0, 0, 0),
+            0.0 // emmisivity = 0
+        )
+    );
+
+    // 2. Object Sphere (Red diffuse sphere on the ground)
+    Objects.push_back(
+        make_shared<Sphere>(
+            LAMBERTIAN, 0.0, 0.0,
+            vec3(0, 1, 0), 1.0,
+            Texture_info(SOLID_COLOR, vec3(0.8, 0.1, 0.1)),
+            vec3(0, 0, 0),
+            0.0 // emmisivity = 0
+        )
+    );
+
+    // 3. Light Sphere (Smaller sphere positioned above and to the right, acting as a light source)
+    Objects.push_back(
+        make_shared<Sphere>(
+            LAMBERTIAN, 0.0, 0.0,
+            vec3(2, 3, -1), 0.6,
+            Texture_info(SOLID_COLOR, vec3(1.0, 1.0, 1.0)),
+            vec3(0, 0, 0),
+            12.0 // emmisivity > 0 (Light emission intensity)
+        )
+    );
+}
+void Scene6(vector<shared_ptr<Hittable>> &Objects) {
+    // 1. Ground Plane (Grey diffuse sphere underneath)
+    Objects.push_back(
+        make_shared<Sphere>(
+            LAMBERTIAN, 0.0, 0.0,
+            vec3(0, -1000, 0), 1000.0,
+            Texture_info(SOLID_COLOR, vec3(0.5, 0.5, 0.5)),
+            vec3(0, 0, 0),
+            0.0 // emmisivity = 0
+        )
+    );
+
+    auto lifted_quad = make_shared<Quad>(
+        vec3(-0.8, 0.2, -0.8), // Corner Q (lifted 0.2 units above the ground)
+        vec3(0.0, 0.0, 1.6),   // Vector u along +Z
+        vec3(1.6, 0.0, 0.0),   // Vector v along +X (u x v points UP: (0, 2.56, 0))
+        LAMBERTIAN, 0.0, 0.0   // Material, fuzz, emmisivity
+    );
+    lifted_quad->texture_info = Texture_info(SOLID_COLOR, vec3(0.8, 0.1, 0.1)); // Red
+    Objects.push_back(lifted_quad);
+
+    // 3. Light Sphere (Floating above and to the right, illuminating the scene)
+    Objects.push_back(
+        make_shared<Sphere>(
+            LAMBERTIAN, 0.0, 0.0,
+            vec3(2.0, 3.0, -1.0), 0.6,
+            Texture_info(SOLID_COLOR, vec3(1.0, 1.0, 1.0)),
+            vec3(0, 0, 0),
+            12.0 // Light intensity
+        )
+    );
+}
+
 void StartTimer(){
     // --- START TIMER ---
     starttime = chrono::high_resolution_clock::now();
@@ -449,6 +522,31 @@ void StopTimer(){
     cerr << "Render time: " << elapsed.count() << "s (" 
          << minutes << "m " << fixed << setprecision(2) << seconds << "s)\n";
 }
+void show_progress(int completed, int total) {
+    const int bar_width = 40;
+
+    double progress = static_cast<double>(completed) / total;
+    int pos = static_cast<int>(bar_width * progress);
+
+    lock_guard<mutex> lock(progress_mutex);
+
+    cerr << "\r[";
+
+    for (int i = 0; i < bar_width; ++i) {
+        if (i < pos)
+            cerr << "=";
+        else if (i == pos)
+            cerr << ">";
+        else
+            cerr << " ";
+    }
+
+    cerr << "] "
+         << fixed << setprecision(1)
+         << progress * 100.0 << "% "
+         << "(" << completed << "/" << total << " rows)"
+         << flush;
+}
 int main()
 {
     ios_base::sync_with_stdio(false);
@@ -463,7 +561,7 @@ int main()
     
     vector<shared_ptr<Hittable>> Objects;
 
-    Scene4(Objects);
+    Scene6(Objects);
     
     double focal_length = 1.0;
     double fov = 40*(pi/180);// horizontal fov
@@ -474,14 +572,11 @@ int main()
     double viewport_delw = viewport_Width/Width;
     double viewport_delh = viewport_Height / Height;
 
-    vec3 camera_pos = vec3(278, 278, -600);
-    vec3 target = vec3(278, 278, 0);
-
-
     
+    vec3 camera_pos = vec3(0, 2.5, 6);
     vec3 vup = vec3(0, 1, 0);
-    vec3 lookat = unit_vector(target - camera_pos);
-    vec3 background_clr  = vec3(0,0,0);
+    vec3 lookat = unit_vector(vec3(0, 1, 0) - camera_pos);
+    vec3 background_clr  = vec3(1,1,1) * 0.7;
 
     vec3 u = unit_vector(cross_product(lookat, vup));
     vec3 v = unit_vector(cross_product(u, lookat));
@@ -519,8 +614,11 @@ int main()
             image[i * Width + j] = pixelij_clr;
             
         }
+        int completed = rows_completed++;
+        show_progress(completed, static_cast<int>(Height));
         
     }
+    cerr << "\n";
     StopTimer();
 
     for(const auto& clr : image) {
