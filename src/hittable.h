@@ -22,10 +22,11 @@ struct Sphere : Hittable {
     struct Texture_info texture_info; //for textures can use a fuction in place of this
     vec3 vel = {0,0,0};
     double emmisivity = 0;
+    double density = 1;
 
     Sphere() = default;
-    Sphere(int mat, double f, double ri, vec3 center, double r, Texture_info tex, vec3 v = {0, 0, 0}, double emmisivity = 0)
-        : material(mat), fuzz(f), r_index(ri), st_center(center), radius(r), texture_info(tex), vel(v), emmisivity(emmisivity) {}
+    Sphere(int mat, double f, double ri, vec3 center, double r, Texture_info tex, vec3 v = {0, 0, 0}, double emmisivity = 0, double density = 0)
+        : material(mat), fuzz(f), r_index(ri), st_center(center), radius(r), texture_info(tex), vel(v), emmisivity(emmisivity), density(density) {}
 
 
     pair<bool, vec3> hit(struct Ray& ray, struct Hit_info &hit_info, double ray_time) const override {
@@ -59,6 +60,7 @@ struct Sphere : Hittable {
                     get_u_v(hit_info, radius);
                     hit_info.emmisivity = emmisivity;
                     hit_info.color = texture_info.give_color(hit_info);
+                    hit_info.density = density;
                 }
                 return {true, point1};
             }
@@ -76,6 +78,7 @@ struct Sphere : Hittable {
                     get_u_v(hit_info, radius);
                     hit_info.emmisivity = emmisivity;
                     hit_info.color = texture_info.give_color(hit_info);
+                    hit_info.density = density;
                 }
                 return {true, point2};
             }
@@ -105,6 +108,7 @@ struct Quad : Hittable {
     double fuzz;  
     struct Texture_info texture_info;
     double emmisivity = 0;
+    double density = 1;
     Quad(vec3 Q, vec3 u, vec3 v, int material, double fuzz, double emmisivity, Texture_info texture_info = {}) : Q(Q), u(u), v(v), material(material), fuzz(fuzz), emmisivity(emmisivity), texture_info(texture_info){
         N = cross_product(u, v);
     }
@@ -124,6 +128,7 @@ struct Quad : Hittable {
                 hit_info.fuzz = fuzz;
                 hit_info.emmisivity = emmisivity;
                 hit_info.color = texture_info.give_color(hit_info);
+                hit_info.density = density;
             }
             return {true, ray.ray_origin + ray.ray_dirc * t};
         }

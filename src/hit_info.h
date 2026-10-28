@@ -14,6 +14,7 @@ struct Hit_info{ // struct returned by ray_clr_helper
     double r_index;
     double u, v;
     double emmisivity;
+    double density;
 };
 
 #endif

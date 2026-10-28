@@ -19,6 +19,7 @@ using namespace std;
 #define LAMBERTIAN 1 
 #define METAL 2 
 #define GLASS 3 
+#define SMOKE 4
 /* --- Material Types --- */
 
 
@@ -68,7 +69,7 @@ void reflect(struct Ray &ray, struct Hit_info &hit_info, bool tir){
     ray.ray_dirc = unit_vector(ray.ray_dirc + (N_star * 2) + fuzz_vector);
 }
 
-vec3 ray_color(vector<shared_ptr<Hittable>> &Obj, Ray ray, int depth, double curr_ref_index, double ray_time, vec3 &background_clr){// will call this fxn for lambertian materials..
+vec3 ray_color(vector<shared_ptr<Hittable>> &Obj, struct Ray &ray, int depth, double curr_ref_index, double ray_time, vec3 &background_clr, bool origin_inside_smoke){// will call this fxn for lambertian materials..
     //this will return the color for the ray 
 
     depth++;
@@ -117,9 +118,38 @@ vec3 ray_color(vector<shared_ptr<Hittable>> &Obj, Ray ray, int depth, double cur
 
         
     }       
+    
+    else if(hit_info.material == SMOKE){
+
+        vec3 in, out;
+        if(origin_inside_smoke){
+            in = ray.ray_origin;
+            out = hit_info.hit_point;
+        }else{
+            in = hit_info.hit_point;
+            Ray ray_ (ray.ray_dirc, in+ray.ray_dirc*0.001);
+            Hit_info hit_info_ = ray_color_helper(Obj, ray_, ray_time, background_clr);
+            out = hit_info_.hit_point;
+        }
+        double dist_traveled = length(out - in);
+        
+        double scatter_dist = (-1/hit_info.density) * log(random_double(0.0001,1));
+        if(scatter_dist > dist_traveled){
+            // ray does not get scattered in the smoke
+            ray.ray_origin = out + (ray.ray_dirc * 0.001);
+            hit_info.color.x = 1;
+            hit_info.color.y = 1;
+            hit_info.color.z = 1;
+            origin_inside_smoke = false;
+        }else{
+            ray.ray_origin = in + ray.ray_dirc * scatter_dist;
+            ray.ray_dirc = genrate_random_dirc();
+            origin_inside_smoke = true;
+        }
+    }
     // Nudge origin forward to prevent self-intersection
-    ray.ray_origin = hit_info.hit_point + (ray.ray_dirc * 0.001);
-    vec3 incoming_light = ray_color(Obj, ray, depth, curr_ref_index, ray_time, background_clr);
+    if(hit_info.material != SMOKE)ray.ray_origin = hit_info.hit_point + (ray.ray_dirc * 0.001);
+    vec3 incoming_light = ray_color(Obj, ray, depth, curr_ref_index, ray_time, background_clr, origin_inside_smoke);
 
     //material albedo * incoming light
     return vec3(
@@ -453,11 +483,11 @@ void Scene5(vector<shared_ptr<Hittable>> &Objects) {
     // 2. Object Sphere (Red diffuse sphere on the ground)
     Objects.push_back(
         make_shared<Sphere>(
-            LAMBERTIAN, 0.0, 0.0,
-            vec3(0, 1, 0), 1.0,
-            Texture_info(SOLID_COLOR, vec3(0.8, 0.1, 0.1)),
+            SMOKE, 0.0, 0.0,
+            vec3(0, 1.1, 0.3), 1.0,
+            Texture_info(SOLID_COLOR, vec3(0.6, 0.2, 0.2)),
             vec3(0, 0, 0),
-            0.0 // emmisivity = 0
+            0.0,1.1 // emmisivity = 0
         )
     );
 
@@ -476,11 +506,11 @@ void Scene6(vector<shared_ptr<Hittable>> &Objects) {
     // 1. Ground Plane (Grey diffuse sphere underneath)
     Objects.push_back(
         make_shared<Sphere>(
-            LAMBERTIAN, 0.0, 0.0,
+            SMOKE, 0.0, 0.0,
             vec3(0, -1000, 0), 1000.0,
             Texture_info(SOLID_COLOR, vec3(0.5, 0.5, 0.5)),
             vec3(0, 0, 0),
-            0.0 // emmisivity = 0
+            0.0,1.5 // emmisivity = 0
         )
     );
 
@@ -561,7 +591,7 @@ int main()
     
     vector<shared_ptr<Hittable>> Objects;
 
-    Scene6(Objects);
+    Scene5(Objects);
     
     double focal_length = 1.0;
     double fov = 40*(pi/180);// horizontal fov
@@ -603,7 +633,8 @@ int main()
                 vec3 pixel_cords = pixelij_pos + (viewport_delw_vec * random_double(-0.5, 0.5)) + (viewport_delh_vec * random_double(-0.5, 0.5));
                 vec3 ray_ij_dirc = unit_vector(pixel_cords - camera_pos);
                 int depth = 0;
-                vec3 clr = ray_color(Objects, {ray_ij_dirc, camera_pos}, depth, MEDIUM_REFACTIVE_INDEX, ray_time, background_clr);
+                Ray ray(ray_ij_dirc, camera_pos);
+                vec3 clr = ray_color(Objects, ray, depth, MEDIUM_REFACTIVE_INDEX, ray_time, background_clr, false);
 
                 pixelij_clr = pixelij_clr + clr;
                 
@@ -627,4 +658,3 @@ int main()
 
     return 0;
 }
-
