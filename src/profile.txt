@@ -1,0 +1,935 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 4K of event 'cpu_atom/cycles/P'
+# Event count (approx.): 1625768400761
+#
+# Children      Self  Command  Shared Object        Symbol                                                                                                                                                                               
+# ........  ........  .......  ...................  .....................................................................................................................................................................................
+#
+    99.57%     0.52%  main     main                 [.] main._omp_fn.0
+            |          
+             --99.05%--main._omp_fn.0
+                       |          
+                       |--56.65%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |          |          
+                       |          |--30.13%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |          |          |          
+                       |          |           --4.57%--Sphere::hit(Ray&, Hit_info&, double) const
+                       |          |          
+                       |           --25.97%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |                     |          
+                       |                     |--15.52%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |                     |          |          
+                       |                     |          |--9.38%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |                     |          |          |          
+                       |                     |          |          |--6.00%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |                     |          |          |          |          
+                       |                     |          |          |          |--3.61%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |                     |          |          |          |          |          
+                       |                     |          |          |          |          |--1.99%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |                     |          |          |          |          |          |          
+                       |                     |          |          |          |          |          |--1.17%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |                     |          |          |          |          |          |          |          
+                       |                     |          |          |          |          |          |          |--0.59%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |                     |          |          |          |          |          |          |          
+                       |                     |          |          |          |          |          |           --0.58%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |                     |          |          |          |          |          |                     |          
+                       |                     |          |          |          |          |          |                      --0.56%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |                     |          |          |          |          |          |          
+                       |                     |          |          |          |          |           --0.82%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |                     |          |          |          |          |          
+                       |                     |          |          |          |           --1.52%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |                     |          |          |          |          
+                       |                     |          |          |           --2.32%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |                     |          |          |          
+                       |                     |          |           --3.34%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |                     |          |          
+                       |                     |           --5.99%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |                     |                     |          
+                       |                     |                      --1.06%--Sphere::hit(Ray&, Hit_info&, double) const
+                       |                     |          
+                       |                      --10.27%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |                                |          
+                       |                                 --2.06%--Sphere::hit(Ray&, Hit_info&, double) const
+                       |          
+                       |--41.31%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |          |          
+                       |           --6.66%--Sphere::hit(Ray&, Hit_info&, double) const
+                       |          
+                        --0.59%--genrate_random_dirc()
+
+    96.97%    79.72%  main     main                 [.] ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          
+            |--74.64%--0
+            |          0x75b6009d3c0e
+            |          main._omp_fn.0
+            |          |          
+            |          |--43.22%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |          |          
+            |          |          |--23.91%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |          |          
+            |          |           --19.27%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          
+            |          |                     |--11.84%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          
+            |          |                     |          |--7.24%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          |          
+            |          |                     |          |          |--4.61%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          |          |          
+            |          |                     |          |          |          |--2.71%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          |          |          |          
+            |          |                     |          |          |          |          |--1.52%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          |          |          |          |          
+            |          |                     |          |          |          |          |          |--0.89%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          |          |          |          |          |          
+            |          |                     |          |          |          |          |          |           --0.52%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |          |          |          |          |          |          
+            |          |                     |          |          |          |          |           --0.63%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |          |          |          |          |          
+            |          |                     |          |          |          |           --1.20%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |          |          |          |          
+            |          |                     |          |          |           --1.90%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |          |          |          
+            |          |                     |          |           --2.63%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |          |          
+            |          |                     |           --4.58%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |          
+            |          |                      --7.40%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |          
+            |           --31.39%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          
+            |--17.25%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |          
+            |          |--15.70%--Sphere::hit(Ray&, Hit_info&, double) const
+            |          |          
+            |           --0.71%--__ieee754_atan2_fma
+            |          
+             --5.08%--GOMP_parallel_loop_nonmonotonic_dynamic
+                       main._omp_fn.0
+                       |          
+                       |--2.68%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |          
+                        --2.40%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          
+                                  |--1.25%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          
+                                   --1.15%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                             |          
+                                             |--0.60%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                             |          
+                                              --0.55%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+
+    93.60%     0.00%  main     [unknown]            [.] 0000000000000000
+            |
+            ---0
+               |          
+                --93.58%--0x75b6009d3c0e
+                          |          
+                           --93.22%--main._omp_fn.0
+                                     |          
+                                     |--53.48%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                     |          |          
+                                     |          |--28.52%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                     |          |          |          
+                                     |          |           --4.25%--Sphere::hit(Ray&, Hit_info&, double) const
+                                     |          |          
+                                     |           --24.47%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                     |                     |          
+                                     |                     |--14.85%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                     |                     |          |          
+                                     |                     |          |--8.96%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                     |                     |          |          |          
+                                     |                     |          |          |--5.81%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                     |                     |          |          |          |          
+                                     |                     |          |          |          |--3.49%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                     |                     |          |          |          |          |          
+                                     |                     |          |          |          |          |--1.92%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                     |                     |          |          |          |          |          |          
+                                     |                     |          |          |          |          |          |--1.15%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                     |                     |          |          |          |          |          |          |          
+                                     |                     |          |          |          |          |          |          |--0.59%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                     |                     |          |          |          |          |          |          |          
+                                     |                     |          |          |          |          |          |           --0.56%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                     |                     |          |          |          |          |          |                     |          
+                                     |                     |          |          |          |          |          |                      --0.54%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                     |                     |          |          |          |          |          |          
+                                     |                     |          |          |          |          |           --0.77%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                     |                     |          |          |          |          |          
+                                     |                     |          |          |          |           --1.48%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                     |                     |          |          |          |          
+                                     |                     |          |          |           --2.25%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                     |                     |          |          |          
+                                     |                     |          |           --3.10%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                     |                     |          |          
+                                     |                     |           --5.75%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                     |                     |                     |          
+                                     |                     |                      --1.01%--Sphere::hit(Ray&, Hit_info&, double) const
+                                     |                     |          
+                                     |                      --9.43%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                     |                                |          
+                                     |                                 --1.82%--Sphere::hit(Ray&, Hit_info&, double) const
+                                     |          
+                                     |--38.27%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                     |          |          
+                                     |           --6.34%--Sphere::hit(Ray&, Hit_info&, double) const
+                                     |          
+                                      --0.59%--genrate_random_dirc()
+
+    93.58%     0.00%  main     libgomp.so.1.0.0     [.] 0x000075b6009d3c0e
+            |
+            ---0x75b6009d3c0e
+               |          
+                --93.22%--main._omp_fn.0
+                          |          
+                          |--53.48%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          |          
+                          |          |--28.52%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |          |          
+                          |          |           --4.25%--Sphere::hit(Ray&, Hit_info&, double) const
+                          |          |          
+                          |           --24.47%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |                     |          
+                          |                     |--14.85%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |                     |          |          
+                          |                     |          |--8.96%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |                     |          |          |          
+                          |                     |          |          |--5.81%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |                     |          |          |          |          
+                          |                     |          |          |          |--3.49%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |                     |          |          |          |          |          
+                          |                     |          |          |          |          |--1.92%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |                     |          |          |          |          |          |          
+                          |                     |          |          |          |          |          |--1.15%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |                     |          |          |          |          |          |          |          
+                          |                     |          |          |          |          |          |          |--0.59%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |                     |          |          |          |          |          |          |          
+                          |                     |          |          |          |          |          |           --0.56%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |                     |          |          |          |          |          |                     |          
+                          |                     |          |          |          |          |          |                      --0.54%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |                     |          |          |          |          |          |          
+                          |                     |          |          |          |          |           --0.77%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |                     |          |          |          |          |          
+                          |                     |          |          |          |           --1.48%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |                     |          |          |          |          
+                          |                     |          |          |           --2.25%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |                     |          |          |          
+                          |                     |          |           --3.10%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |                     |          |          
+                          |                     |           --5.75%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |                     |                     |          
+                          |                     |                      --1.01%--Sphere::hit(Ray&, Hit_info&, double) const
+                          |                     |          
+                          |                      --9.43%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |                                |          
+                          |                                 --1.82%--Sphere::hit(Ray&, Hit_info&, double) const
+                          |          
+                          |--38.27%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |          
+                          |           --6.34%--Sphere::hit(Ray&, Hit_info&, double) const
+                          |          
+                           --0.59%--genrate_random_dirc()
+
+    56.65%     0.21%  main     main                 [.] ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          
+             --56.43%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |          
+                       |--30.13%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |          |          
+                       |           --4.57%--Sphere::hit(Ray&, Hit_info&, double) const
+                       |          
+                        --25.93%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          
+                                  |--15.49%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          
+                                  |          |--9.36%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          |          
+                                  |          |          |--6.00%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          |          |          
+                                  |          |          |          |--3.61%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          |          |          |          
+                                  |          |          |          |          |--1.99%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          |          |          |          |          
+                                  |          |          |          |          |          |--1.17%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          |          |          |          |          |          
+                                  |          |          |          |          |          |          |--0.59%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          |          |          |          |          |          |          
+                                  |          |          |          |          |          |           --0.58%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          |          |          |          |                     |          
+                                  |          |          |          |          |          |                      --0.56%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          |          |          |          |          |          
+                                  |          |          |          |          |           --0.82%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          |          |          |          |          
+                                  |          |          |          |           --1.52%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          |          |          |          
+                                  |          |          |           --2.32%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          |          |          
+                                  |          |           --3.34%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          |          
+                                  |           --5.99%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |                     |          
+                                  |                      --1.06%--Sphere::hit(Ray&, Hit_info&, double) const
+                                  |          
+                                   --10.27%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                             |          
+                                              --2.06%--Sphere::hit(Ray&, Hit_info&, double) const
+
+    15.93%    15.74%  main     main                 [.] Sphere::hit(Ray&, Hit_info&, double) const
+            |          
+            |--14.76%--0
+            |          0x75b6009d3c0e
+            |          main._omp_fn.0
+            |          |          
+            |          |--8.49%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |          |          
+            |          |          |--4.25%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |          |          Sphere::hit(Ray&, Hit_info&, double) const
+            |          |          |          
+            |          |           --4.14%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          
+            |          |                     |--2.32%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          
+            |          |                     |          |--1.31%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          |          
+            |          |                     |          |           --0.91%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |                     |          
+            |          |                     |          |                      --0.56%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          
+            |          |                     |           --1.01%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |                     Sphere::hit(Ray&, Hit_info&, double) const
+            |          |                     |          
+            |          |                      --1.82%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                                Sphere::hit(Ray&, Hit_info&, double) const
+            |          |          
+            |           --6.27%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |                     Sphere::hit(Ray&, Hit_info&, double) const
+            |          
+             --0.98%--GOMP_parallel_loop_nonmonotonic_dynamic
+                       main._omp_fn.0
+                       |          
+                        --0.67%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+
+     6.38%     0.00%  main     libgomp.so.1.0.0     [.] GOMP_parallel_loop_nonmonotonic_dynamic
+            |
+            ---GOMP_parallel_loop_nonmonotonic_dynamic
+               |          
+                --6.35%--main._omp_fn.0
+                          |          
+                          |--3.16%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          |          
+                          |          |--1.61%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |          
+                          |           --1.50%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |                     |          
+                          |                     |--0.84%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |                     |          
+                          |                      --0.67%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          
+                           --3.04%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+
+     1.19%     1.19%  main     main                 [.] std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand()
+            |          
+             --1.09%--0
+                       0x75b6009d3c0e
+                       |          
+                        --0.78%--main._omp_fn.0
+
+     0.83%     0.83%  main     main                 [.] genrate_random_dirc()
+            |          
+             --0.81%--0
+                       0x75b6009d3c0e
+                       main._omp_fn.0
+                       |          
+                        --0.59%--genrate_random_dirc()
+
+     0.71%     0.71%  main     libm.so.6            [.] __ieee754_atan2_fma
+            |          
+             --0.68%--0
+                       0x75b6009d3c0e
+                       main._omp_fn.0
+
+     0.50%     0.50%  main     libm.so.6            [.] __ieee754_acos_fma
+     0.19%     0.00%  main     [unknown]            [.] 0xffffffff91600f4b
+     0.19%     0.00%  main     [unknown]            [.] 0xffffffff9160104b
+     0.19%     0.00%  main     [unknown]            [.] 0xffffffff9142ddbb
+     0.19%     0.00%  main     [unknown]            [.] 0xffffffff9025a3c3
+     0.14%     0.00%  main     [unknown]            [.] 0xffffffff91430bfb
+     0.14%     0.00%  main     [unknown]            [.] 0xffffffff902ad43e
+     0.14%     0.00%  main     [unknown]            [.] 0xffffffff9100b6e3
+     0.12%     0.12%  main     libm.so.6            [.] __ieee754_log_fma
+     0.11%     0.00%  main     [unknown]            [.] 0xffffffffc17b8a19
+     0.11%     0.00%  main     [unknown]            [.] 0xffffffff9144299e
+     0.11%     0.00%  main     [unknown]            [.] 0xffffffff903a4df7
+     0.10%     0.00%  main     [unknown]            [.] 0xffffffff9040c6c6
+     0.10%     0.00%  main     [unknown]            [.] 0xffffffff9040b787
+     0.09%     0.09%  main     [unknown]            [k] 0xffffffff9144368c
+     0.09%     0.00%  main     [unknown]            [.] 0xffffffff9144368e
+     0.07%     0.00%  main     [unknown]            [.] 0xffffffff90423678
+     0.07%     0.00%  main     [unknown]            [.] 0xffffffff90423158
+     0.07%     0.00%  main     [unknown]            [.] 0xffffffff9040a839
+     0.07%     0.00%  main     [unknown]            [.] 0xffffffff903664dd
+     0.07%     0.00%  main     [unknown]            [.] 0xffffffff905a661c
+     0.05%     0.05%  main     [unknown]            [k] 0xffffffff905a22ad
+     0.05%     0.00%  main     [unknown]            [.] 0xffffffff905a22b4
+     0.05%     0.05%  main     [unknown]            [k] 0xffffffff902c7977
+     0.05%     0.00%  main     [unknown]            [.] 0xffffffff902c7979
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff91600f30
+     0.02%     0.02%  main     [unknown]            [k] 0xffffffff9042355e
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff90423632
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff90423565
+     0.02%     0.02%  main     [unknown]            [k] 0xffffffff903793fc
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff91430c00
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff90311a7e
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff903116e9
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff90311398
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff9037b55c
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff9037af39
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff90379a81
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff9037973d
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff90379402
+     0.02%     0.02%  main     [unknown]            [k] 0xffffffff902c7907
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff9100b5fc
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff91065d64
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff902c7909
+     0.02%     0.02%  main     [unknown]            [k] 0xffffffff904103c2
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff9040c655
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff904103c4
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff9100b606
+     0.02%     0.02%  main     [unknown]            [k] 0xffffffff914431c3
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff914431c7
+     0.02%     0.02%  main     [unknown]            [k] 0xffffffff902ad24f
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff9040c6ef
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff90422b33
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff9041fe63
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff902ad251
+     0.02%     0.02%  main     main                 [.] atan2@plt
+     0.02%     0.02%  main     main                 [.] Texture_info::give_color(Hit_info const&) const
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffffc17b8a2b
+     0.02%     0.02%  main     [unknown]            [k] 0xffffffff9059e382
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff91430c0b
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff91432383
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff9143226e
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff9143a263
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff91439d55
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff90357beb
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff905a8305
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff905a6db6
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff9059e384
+     0.02%     0.02%  main     [unknown]            [k] 0xffffffff914436ab
+     0.02%     0.00%  main     [unknown]            [.] 0xffffffff914436ad
+     0.02%     0.02%  main     libstdc++.so.6.0.30  [.] std::basic_streambuf<char, std::char_traits<char> >::xsputn(char const*, long)
+     0.02%     0.02%  main     libgomp.so.1.0.0     [.] 0x0000000000020600
+     0.02%     0.00%  main     libgomp.so.1.0.0     [.] 0x000075b6009d6602
+
+
+# Samples: 8K of event 'cpu_core/cycles/P'
+# Event count (approx.): 3900701127065
+#
+# Children      Self  Command  Shared Object     Symbol                                                                                                                                                                               
+# ........  ........  .......  ................  .....................................................................................................................................................................................
+#
+    99.32%     0.57%  main     main              [.] main._omp_fn.0
+            |          
+            |--98.74%--main._omp_fn.0
+            |          |          
+            |          |--56.71%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |          |          
+            |          |          |--29.51%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |          |          |          
+            |          |          |           --2.97%--Sphere::hit(Ray&, Hit_info&, double) const
+            |          |          |          
+            |          |           --26.48%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          
+            |          |                     |--16.19%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          
+            |          |                     |          |--10.14%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          |          
+            |          |                     |          |          |--5.92%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          |          |          
+            |          |                     |          |          |          |--3.60%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          |          |          |          
+            |          |                     |          |          |          |          |--1.95%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          |          |          |          |          
+            |          |                     |          |          |          |          |          |--0.97%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          |                     |          |          |          |          |          |          |          
+            |          |                     |          |          |          |          |          |           --0.62%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |          |          |          |          |          |          
+            |          |                     |          |          |          |          |           --0.94%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |          |          |          |          |          
+            |          |                     |          |          |          |           --1.62%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |          |          |          |          
+            |          |                     |          |          |           --2.24%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |          |          |          
+            |          |                     |          |           --4.07%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |          |                     |          
+            |          |                     |          |                      --0.56%--Sphere::hit(Ray&, Hit_info&, double) const
+            |          |                     |          |          
+            |          |                     |           --5.90%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                     |                     |          
+            |          |                     |                      --0.79%--Sphere::hit(Ray&, Hit_info&, double) const
+            |          |                     |          
+            |          |                      --9.96%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |                                |          
+            |          |                                 --1.17%--Sphere::hit(Ray&, Hit_info&, double) const
+            |          |          
+            |          |--40.44%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |          |          
+            |          |           --4.00%--Sphere::hit(Ray&, Hit_info&, double) const
+            |          |          
+            |          |--0.88%--std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand()
+            |          |          
+            |           --0.58%--genrate_random_dirc()
+            |          
+             --0.54%--0
+                       0x75b6009d3c0e
+                       main._omp_fn.0
+
+    96.93%     0.00%  main     [unknown]         [.] 0000000000000000
+            |
+            ---0
+               |          
+                --96.90%--0x75b6009d3c0e
+                          |          
+                          |--96.28%--main._omp_fn.0
+                          |          |          
+                          |          |--54.66%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          |          |          
+                          |          |          |--28.25%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |          |          |          
+                          |          |          |           --2.88%--Sphere::hit(Ray&, Hit_info&, double) const
+                          |          |          |          
+                          |          |           --25.74%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          |                     |          
+                          |          |                     |--15.73%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          |                     |          |          
+                          |          |                     |          |--9.88%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          |                     |          |          |          
+                          |          |                     |          |          |--5.75%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          |                     |          |          |          |          
+                          |          |                     |          |          |          |--3.48%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          |                     |          |          |          |          |          
+                          |          |                     |          |          |          |          |--1.86%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          |                     |          |          |          |          |          |          
+                          |          |                     |          |          |          |          |          |--0.95%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          |                     |          |          |          |          |          |          |          
+                          |          |                     |          |          |          |          |          |           --0.60%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |                     |          |          |          |          |          |          
+                          |          |                     |          |          |          |          |           --0.87%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |                     |          |          |          |          |          
+                          |          |                     |          |          |          |           --1.58%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |                     |          |          |          |          
+                          |          |                     |          |          |           --2.19%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |                     |          |          |          
+                          |          |                     |          |           --3.99%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |                     |          |                     |          
+                          |          |                     |          |                      --0.56%--Sphere::hit(Ray&, Hit_info&, double) const
+                          |          |                     |          |          
+                          |          |                     |           --5.69%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |                     |                     |          
+                          |          |                     |                      --0.73%--Sphere::hit(Ray&, Hit_info&, double) const
+                          |          |                     |          
+                          |          |                      --9.69%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |                                |          
+                          |          |                                 --1.13%--Sphere::hit(Ray&, Hit_info&, double) const
+                          |          |          
+                          |          |--39.50%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |          |          
+                          |          |           --3.96%--Sphere::hit(Ray&, Hit_info&, double) const
+                          |          |          
+                          |          |--0.87%--std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand()
+                          |          |          
+                          |           --0.58%--genrate_random_dirc()
+                          |          
+                           --0.58%--std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand()
+
+    96.90%     0.00%  main     libgomp.so.1.0.0  [.] 0x000075b6009d3c0e
+            |
+            ---0x75b6009d3c0e
+               |          
+               |--96.28%--main._omp_fn.0
+               |          |          
+               |          |--54.66%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+               |          |          |          
+               |          |          |--28.25%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+               |          |          |          |          
+               |          |          |           --2.88%--Sphere::hit(Ray&, Hit_info&, double) const
+               |          |          |          
+               |          |           --25.74%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+               |          |                     |          
+               |          |                     |--15.73%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+               |          |                     |          |          
+               |          |                     |          |--9.88%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+               |          |                     |          |          |          
+               |          |                     |          |          |--5.75%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+               |          |                     |          |          |          |          
+               |          |                     |          |          |          |--3.48%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+               |          |                     |          |          |          |          |          
+               |          |                     |          |          |          |          |--1.86%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+               |          |                     |          |          |          |          |          |          
+               |          |                     |          |          |          |          |          |--0.95%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+               |          |                     |          |          |          |          |          |          |          
+               |          |                     |          |          |          |          |          |           --0.60%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+               |          |                     |          |          |          |          |          |          
+               |          |                     |          |          |          |          |           --0.87%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+               |          |                     |          |          |          |          |          
+               |          |                     |          |          |          |           --1.58%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+               |          |                     |          |          |          |          
+               |          |                     |          |          |           --2.19%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+               |          |                     |          |          |          
+               |          |                     |          |           --3.99%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+               |          |                     |          |                     |          
+               |          |                     |          |                      --0.56%--Sphere::hit(Ray&, Hit_info&, double) const
+               |          |                     |          |          
+               |          |                     |           --5.69%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+               |          |                     |                     |          
+               |          |                     |                      --0.73%--Sphere::hit(Ray&, Hit_info&, double) const
+               |          |                     |          
+               |          |                      --9.69%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+               |          |                                |          
+               |          |                                 --1.13%--Sphere::hit(Ray&, Hit_info&, double) const
+               |          |          
+               |          |--39.50%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+               |          |          |          
+               |          |           --3.96%--Sphere::hit(Ray&, Hit_info&, double) const
+               |          |          
+               |          |--0.87%--std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand()
+               |          |          
+               |           --0.58%--genrate_random_dirc()
+               |          
+                --0.58%--std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand()
+
+    95.82%    83.35%  main     main              [.] ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          
+            |--80.75%--0
+            |          0x75b6009d3c0e
+            |          |          
+            |           --80.74%--main._omp_fn.0
+            |                     |          
+            |                     |--46.12%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |                     |          |          
+            |                     |          |--24.87%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |                     |          |          
+            |                     |           --21.16%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |                     |                     |          
+            |                     |                     |--12.92%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |                     |                     |          |          
+            |                     |                     |          |--8.04%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |                     |                     |          |          |          
+            |                     |                     |          |          |--4.69%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |                     |                     |          |          |          |          
+            |                     |                     |          |          |          |--2.88%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |                     |                     |          |          |          |          |          
+            |                     |                     |          |          |          |          |--1.54%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |                     |                     |          |          |          |          |          |          
+            |                     |                     |          |          |          |          |          |--0.79%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |                     |                     |          |          |          |          |          |          
+            |                     |                     |          |          |          |          |           --0.75%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |                     |                     |          |          |          |          |          
+            |                     |                     |          |          |          |           --1.35%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |                     |                     |          |          |          |          
+            |                     |                     |          |          |           --1.81%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |                     |                     |          |          |          
+            |                     |                     |          |           --3.34%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |                     |                     |          |          
+            |                     |                     |           --4.87%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |                     |                     |          
+            |                     |                      --8.24%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |                     |          
+            |                      --34.57%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          
+            |--12.46%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+            |          |          
+            |          |--10.24%--Sphere::hit(Ray&, Hit_info&, double) const
+            |          |          
+            |           --0.75%--__ieee754_atan2_fma
+            |          
+             --2.60%--GOMP_parallel_loop_nonmonotonic_dynamic
+                       main._omp_fn.0
+                       |          
+                       |--1.73%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |          |          
+                       |          |--1.15%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |          |          
+                       |           --0.58%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |          
+                        --0.86%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+
+    56.74%     0.38%  main     main              [.] ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+            |          
+             --56.36%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |          
+                       |--29.52%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |          |          
+                       |           --2.97%--Sphere::hit(Ray&, Hit_info&, double) const
+                       |          
+                        --26.29%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          
+                                  |--16.09%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          
+                                  |          |--10.07%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          |          
+                                  |          |          |--5.87%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          |          |          
+                                  |          |          |          |--3.59%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          |          |          |          
+                                  |          |          |          |          |--1.94%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          |          |          |          |          
+                                  |          |          |          |          |          |--0.96%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                                  |          |          |          |          |          |          |          
+                                  |          |          |          |          |          |           --0.62%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          |          |          |          |          |          
+                                  |          |          |          |          |           --0.94%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          |          |          |          |          
+                                  |          |          |          |           --1.62%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          |          |          |          
+                                  |          |          |           --2.24%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          |          |          
+                                  |          |           --4.07%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          |                     |          
+                                  |          |                      --0.56%--Sphere::hit(Ray&, Hit_info&, double) const
+                                  |          |          
+                                  |           --5.90%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |                     |          
+                                  |                      --0.79%--Sphere::hit(Ray&, Hit_info&, double) const
+                                  |          
+                                   --9.96%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                             |          
+                                              --1.17%--Sphere::hit(Ray&, Hit_info&, double) const
+
+    10.53%    10.27%  main     main              [.] Sphere::hit(Ray&, Hit_info&, double) const
+            |          
+             --9.99%--0
+                       0x75b6009d3c0e
+                       main._omp_fn.0
+                       |          
+                       |--5.99%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |          |          
+                       |          |--3.13%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |          |          |          
+                       |          |          |--1.98%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |          |          |          |          
+                       |          |          |          |--1.25%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |          |          |          |          |          
+                       |          |          |          |          |--0.71%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |          |          |          |          |          
+                       |          |          |          |           --0.54%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |          |          |          |                     Sphere::hit(Ray&, Hit_info&, double) const
+                       |          |          |          |          
+                       |          |          |           --0.73%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |          |          |                     |          
+                       |          |          |                      --0.72%--Sphere::hit(Ray&, Hit_info&, double) const
+                       |          |          |          
+                       |          |           --1.13%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |          |                     Sphere::hit(Ray&, Hit_info&, double) const
+                       |          |          
+                       |           --2.85%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                       |                     Sphere::hit(Ray&, Hit_info&, double) const
+                       |          
+                        --3.95%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                                  |          
+                                   --3.91%--Sphere::hit(Ray&, Hit_info&, double) const
+
+     3.06%     0.00%  main     libgomp.so.1.0.0  [.] GOMP_parallel_loop_nonmonotonic_dynamic
+            |
+            ---GOMP_parallel_loop_nonmonotonic_dynamic
+               |          
+                --3.02%--main._omp_fn.0
+                          |          
+                          |--2.04%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          |          
+                          |          |--1.26%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+                          |          |          
+                          |           --0.74%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                          |          
+                           --0.93%--ray_color_helper(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray, double, vec3&)
+
+     2.09%     2.04%  main     main              [.] std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand()
+            |          
+             --1.97%--0
+                       0x75b6009d3c0e
+                       |          
+                       |--1.39%--main._omp_fn.0
+                       |          |          
+                       |          |--0.86%--std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand()
+                       |          |          
+                       |           --0.54%--ray_color(std::vector<std::shared_ptr<Hittable>, std::allocator<std::shared_ptr<Hittable> > >&, Ray&, int, double, double, vec3&, bool)
+                       |          
+                        --0.58%--std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand()
+
+     0.92%     0.91%  main     main              [.] genrate_random_dirc()
+            |          
+             --0.89%--0
+                       0x75b6009d3c0e
+                       main._omp_fn.0
+                       |          
+                        --0.58%--genrate_random_dirc()
+
+     0.77%     0.75%  main     libm.so.6         [.] __ieee754_atan2_fma
+            |          
+             --0.74%--0
+                       0x75b6009d3c0e
+                       main._omp_fn.0
+
+     0.50%     0.00%  main     [unknown]         [.] 0xffffffff9160104b
+     0.50%     0.00%  main     [unknown]         [.] 0xffffffff9142ddbb
+     0.50%     0.00%  main     [unknown]         [.] 0xffffffff9025a3c3
+     0.44%     0.43%  main     libm.so.6         [.] __ieee754_acos_fma
+     0.36%     0.00%  main     [unknown]         [.] 0xffffffff9100b6e3
+     0.35%     0.00%  main     [unknown]         [.] 0xffffffff9144299e
+     0.33%     0.00%  main     [unknown]         [.] 0xffffffffc17b8a19
+     0.32%     0.00%  main     [unknown]         [.] 0xffffffff903a4df7
+     0.29%     0.01%  main     [unknown]         [k] 0xffffffff9144368e
+     0.27%     0.27%  main     [unknown]         [k] 0xffffffff9144368c
+     0.20%     0.00%  main     [unknown]         [.] 0xffffffff91600f4b
+     0.15%     0.00%  main     [unknown]         [.] 0xffffffff91600ea7
+     0.15%     0.00%  main     [unknown]         [.] 0xffffffff9142da64
+     0.15%     0.00%  main     [unknown]         [.] 0xffffffff90259bae
+     0.15%     0.00%  main     [unknown]         [.] 0xffffffff903c454d
+     0.15%     0.00%  main     [unknown]         [.] 0xffffffff903bec79
+     0.15%     0.00%  main     [unknown]         [.] 0xffffffff903bea5c
+     0.13%     0.11%  main     libm.so.6         [.] __atan2
+     0.13%     0.00%  main     [unknown]         [.] 0xffffffff91430bfb
+     0.13%     0.00%  main     [unknown]         [.] 0xffffffff902ad43e
+     0.13%     0.00%  main     [unknown]         [.] 0xffffffff9040c6c6
+     0.12%     0.00%  main     [unknown]         [.] 0xffffffff9040b787
+     0.12%     0.12%  main     main              [.] random_double(double, double)
+     0.11%     0.11%  main     [unknown]         [k] 0xffffffff902c7907
+     0.11%     0.00%  main     [unknown]         [.] 0xffffffff9100b5fc
+     0.11%     0.00%  main     [unknown]         [.] 0xffffffff91065d64
+     0.11%     0.00%  main     [unknown]         [.] 0xffffffff902c7909
+     0.10%     0.00%  main     [unknown]         [.] 0xffffffff90423678
+     0.10%     0.00%  main     [unknown]         [.] 0xffffffff90423158
+     0.10%     0.00%  main     [unknown]         [.] 0xffffffff9040a839
+     0.08%     0.08%  main     [unknown]         [k] 0xffffffff90febe9f
+     0.08%     0.00%  main     [unknown]         [.] 0xffffffff90dbbbff
+     0.08%     0.00%  main     [unknown]         [.] 0xffffffff90dbbab5
+     0.08%     0.00%  main     [unknown]         [.] 0xffffffff90febea1
+     0.06%     0.00%  main     [unknown]         [.] 0xffffffff903664dd
+     0.06%     0.00%  main     [unknown]         [.] 0xffffffff90feec0b
+     0.06%     0.06%  main     [unknown]         [k] 0xffffffff90b39275
+     0.06%     0.00%  main     [unknown]         [.] 0xffffffff90b39278
+     0.05%     0.00%  main     [unknown]         [.] 0xffffffff905a661c
+     0.05%     0.05%  main     [unknown]         [k] 0xffffffff902c7977
+     0.05%     0.00%  main     [unknown]         [.] 0xffffffff902c7979
+     0.05%     0.00%  main     [unknown]         [.] 0xffffffff91430c00
+     0.05%     0.00%  main     [unknown]         [.] 0xffffffff90311a7e
+     0.04%     0.00%  main     [unknown]         [.] 0xffffffff90fee949
+     0.04%     0.04%  main     [unknown]         [k] 0xffffffff9160128c
+     0.04%     0.01%  main     main              [.] atan2@plt
+     0.04%     0.04%  main     [unknown]         [k] 0xffffffff914436a9
+     0.04%     0.00%  main     [unknown]         [.] 0xffffffff914436ab
+     0.04%     0.04%  main     main              [.] Texture_info::give_color(Hit_info const&) const
+     0.03%     0.00%  main     [unknown]         [.] 0xffffffff903116e9
+     0.03%     0.00%  main     [unknown]         [.] 0xffffffff90311398
+     0.02%     0.02%  main     [unknown]         [k] 0xffffffff903a4dc7
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff903a4dcb
+     0.02%     0.01%  main     libm.so.6         [.] __atan2_finite@GLIBC_2.15@plt
+     0.02%     0.02%  main     [unknown]         [k] 0xffffffff914431c3
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff914431c7
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff9040984d
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff90409782
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff904093d7
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff90d7528d
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff90d746b6
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff90d5d7f8
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff90d5a2c4
+     0.02%     0.02%  main     libgomp.so.1.0.0  [.] 0x00000000000207b8
+     0.02%     0.00%  main     libgomp.so.1.0.0  [.] 0x000075b6009d67ba
+     0.02%     0.02%  main     [unknown]         [k] 0xffffffff905a22ad
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff905a22b4
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff90fee913
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff91430c0b
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff91432383
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff9143226e
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff9143a263
+     0.02%     0.00%  main     [unknown]         [.] 0xffffffff91439ed9
+     0.02%     0.02%  main     libm.so.6         [.] log@@GLIBC_2.29
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9040b142
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90365745
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90365162
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff90423135
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90423136
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffffffffec78
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff91600f30
+     0.01%     0.01%  main     libm.so.6         [.] __ieee754_log_fma
+     0.01%     0.01%  main     libm.so.6         [.] __acos
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff902c7b64
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff902c7b66
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff902c7983
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9036641a
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9027c40c
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff902c7985
+     0.01%     0.01%  main     libm.so.6         [.] __acos_finite@GLIBC_2.15@plt
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff91443693
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff91601030
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff90387ab4
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff903664a3
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff903748db
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9036e7ee
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9037d2e0
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9100b606
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff91443313
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff905a23e4
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90feeb45
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90fed200
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff905a65cf
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff905a65da
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff9142d2d3
+     0.01%     0.00%  main     [unknown]         [k] 0x3fe9da16cdbbd18a
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9142d2db
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffffc108709f
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9160106b
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9142e4db
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9025fcdc
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9050c818
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9050c7c3
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9050c737
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffffc10870a6
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9100b63a
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9100b52c
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff90d57b8e
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90d59f78
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90d57b92
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffffc17b8a2b
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff9142e851
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9036646f
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9035a88c
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90395ef2
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90268f70
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9142e939
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9142e855
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff90b3a3a0
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90b392b4
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff903be18a
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff903be08d
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff903c444a
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90b3a464
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90b3a3a3
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9100b69a
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff9038f92a
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff903a1740
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9038f92e
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff90311647
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9031164e
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90feeb02
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff9038f91c
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff903a18db
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9038f920
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff9040b5e0
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9040b76f
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9040b5fd
+     0.01%     0.01%  main     libgomp.so.1.0.0  [.] 0x0000000000020600
+     0.01%     0.00%  main     libgomp.so.1.0.0  [.] 0x000075b6009d6602
+     0.01%     0.01%  main     [unknown]         [k] 0xffffffff903721fe
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9037b55c
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9037af39
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90379b55
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff90372b0b
+     0.01%     0.00%  main     [unknown]         [.] 0xffffffff9037221e
+
+
+#
+# (Cannot load tips.txt file, please install perf!)
+#

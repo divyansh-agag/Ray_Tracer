@@ -35,7 +35,7 @@ mutex progress_mutex;
 vector<vec3> image(Width * Height);
 std::chrono::high_resolution_clock::time_point starttime; 
 
-Hit_info ray_color_helper(vector<shared_ptr<Hittable>> &Obj, Ray ray, double ray_time, vec3 &background_clr){
+Hit_info ray_color_helper(const vector<shared_ptr<Hittable>> &Obj,Ray &ray, double ray_time, vec3 &background_clr){
     //handels the single ray for many objects..
     
     //returns clr in 0.0 to 1.0 range and the normal vector where ray hits and also the point where ray hits the object ...
@@ -53,7 +53,7 @@ Hit_info ray_color_helper(vector<shared_ptr<Hittable>> &Obj, Ray ray, double ray
     hit_info.hit = false;
     hit_info.dist = 1e9;
     hit_info.color = background_clr;
-    for(auto obj: Obj){
+    for(const auto &obj: Obj){
         obj->hit(ray, hit_info, ray_time);
     }
     return hit_info;//check here.. (default values ?)
@@ -621,7 +621,7 @@ int main()
 
 
     StartTimer();
-    #pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel for schedule(guided)
     for(int i=0;i<(int)Height;i++){
         for(int j=0;j<(int)Width;j++){
             vec3 pixelij_pos = pixel00_pos + (viewport_delw_vec * j) + (viewport_delh_vec * -i);
